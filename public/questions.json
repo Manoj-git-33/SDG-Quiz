@@ -1,0 +1,536 @@
+{
+    "JAVA23A": {
+        "name": "Set A",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which of the following is not an OOP concept in Java?",
+                "options": [
+                    "Encapsulation",
+                    "Polymorphism",
+                    "Compilation",
+                    "Abstraction"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Compilation is a process, not an OOP concept. The core OOP concepts are encapsulation, inheritance, polymorphism, and abstraction."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which keyword is used to define a class in Java?",
+                "options": [
+                    "object",
+                    "define",
+                    "class",
+                    "new"
+                ],
+                "correctAnswer": 2,
+                "explanation": "The 'class' keyword is used to define a class in Java, followed by the class name."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "What is the default value of a boolean variable in Java?",
+                "options": [
+                    "true",
+                    "false",
+                    "0",
+                    "null"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The default value of a boolean variable in Java is 'false'."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which method is the entry point of a Java program?",
+                "options": [
+                    "start()",
+                    "main()",
+                    "run()",
+                    "execute()"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The 'main()' method is the entry point of any Java program."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which of the following allows method overriding in Java?",
+                "options": [
+                    "final",
+                    "static",
+                    "private",
+                    "None of the above"
+                ],
+                "correctAnswer": 3,
+                "explanation": "None of the listed modifiers allow method overriding. Method overriding requires inheritance and non-final, non-static, non-private methods."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "What is the use of the 'super' keyword in Java?",
+                "options": [
+                    "Refer current class",
+                    "Refer parent class",
+                    "Refer child class",
+                    "Create object"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The 'super' keyword is used to refer to the parent class members (methods and variables)."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which type of inheritance does Java not support directly?",
+                "options": [
+                    "Single",
+                    "Multilevel",
+                    "Hierarchical",
+                    "Multiple"
+                ],
+                "correctAnswer": 3,
+                "explanation": "Java doesn't support multiple inheritance with classes, but it can be achieved with interfaces."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which block always executes in exception handling?",
+                "options": [
+                    "try",
+                    "catch",
+                    "finally",
+                    "throw"
+                ],
+                "correctAnswer": 2,
+                "explanation": "The 'finally' block always executes, whether an exception is thrown or not."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which method is used for thread communication in Java?",
+                "options": [
+                    "join()",
+                    "start()",
+                    "wait()",
+                    "run()"
+                ],
+                "correctAnswer": 2,
+                "explanation": "The 'wait()' method is used for inter-thread communication in Java."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "What will happen if we try to inherit a final class?",
+                "options": [
+                    "Compile time error",
+                    "Run time error",
+                    "No error",
+                    "NullPointerException"
+                ],
+                "correctAnswer": 0,
+                "explanation": "A final class cannot be inherited, so attempting to do so will result in a compile-time error."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which of the following is true about abstract methods?",
+                "options": [
+                    "They have a body",
+                    "They can be private",
+                    "They are always static",
+                    "They must be overridden"
+                ],
+                "correctAnswer": 3,
+                "explanation": "Abstract methods must be overridden by the first concrete (non-abstract) subclass."
+            },
+            {
+                "type": "tf",
+                "difficulty": "easy",
+                "question": "Java supports both call by value and call by reference.",
+                "correctAnswer": 1,
+                "explanation": "False. Java only supports call by value. Object references are passed by value."
+            },
+            {
+                "type": "tf",
+                "difficulty": "easy",
+                "question": "An object is an instance of a class.",
+                "correctAnswer": 0,
+                "explanation": "True. An object is an instance of a class."
+            },
+            {
+                "type": "tf",
+                "difficulty": "easy",
+                "question": "The 'this' keyword in Java refers to the current object.",
+                "correctAnswer": 0,
+                "explanation": "True. The 'this' keyword refers to the current object instance."
+            },
+            {
+                "type": "tf",
+                "difficulty": "easy",
+                "question": "Java supports multiple inheritance using classes.",
+                "correctAnswer": 1,
+                "explanation": "False. Java doesn't support multiple inheritance with classes, only with interfaces."
+            },
+            {
+                "type": "tf",
+                "difficulty": "medium",
+                "question": "A class that inherits another class is known as a superclass.",
+                "correctAnswer": 1,
+                "explanation": "False. A class that inherits another is a subclass (or child class). The class being inherited from is the superclass."
+            },
+            {
+                "type": "tf",
+                "difficulty": "medium",
+                "question": "Method overloading depends on the return type of methods.",
+                "correctAnswer": 1,
+                "explanation": "False. Method overloading depends on method name and parameter list, not return type."
+            },
+            {
+                "type": "tf",
+                "difficulty": "medium",
+                "question": "Constructors can be inherited in Java.",
+                "correctAnswer": 1,
+                "explanation": "False. Constructors are not inherited in Java."
+            },
+            {
+                "type": "tf",
+                "difficulty": "medium",
+                "question": "In Java, an interface can have method bodies.",
+                "correctAnswer": 0,
+                "explanation": "True. Since Java 8, interfaces can have default and static methods with bodies."
+            },
+            {
+                "type": "tf",
+                "difficulty": "hard",
+                "question": "Overloading the 'main()' method is not allowed in Java.",
+                "correctAnswer": 1,
+                "explanation": "False. You can overload the main() method, but only the standard 'public static void main(String[] args)' is called when the program starts."
+            }
+        ],
+        "debug": [
+            {
+                "type": "debug",
+                "difficulty": "easy",
+                "question": "Debug the following code that's supposed to calculate the sum of two numbers:",
+                "code": "public int sum(int a, int b) {\n  return a - b;\n}",
+                "correctAnswer": "public int sum(int a, int b) {\n  return a + b;\n}",
+                "explanation": "The original code was subtracting instead of adding the numbers."
+            },
+            {
+                "type": "debug",
+                "difficulty": "easy",
+                "question": "Fix the following code that checks if a number is even:",
+                "code": "public boolean isEven(int num) {\n  return num % 2 != 0;\n}",
+                "correctAnswer": "public boolean isEven(int num) {\n  return num % 2 == 0;\n}",
+                "explanation": "The condition was reversed - it was returning true for odd numbers instead of even."
+            },
+            {
+                "type": "debug",
+                "difficulty": "medium",
+                "question": "Debug the following code that's supposed to calculate factorial:",
+                "code": "public int factorial(int n) {\n  int result = 0;\n  for (int i = 1; i <= n; i++) {\n    result *= i;\n  }\n  return result;\n}",
+                "correctAnswer": "public int factorial(int n) {\n  int result = 1;\n  for (int i = 1; i <= n; i++) {\n    result *= i;\n  }\n  return result;\n}",
+                "explanation": "The initial code had result initialized to 0, which would always return 0 since multiplying by 0 gives 0."
+            },
+            {
+                "type": "debug",
+                "difficulty": "medium",
+                "question": "Fix the following code that reverses a string:",
+                "code": "public String reverse(String str) {\n  String result = \"\";\n  for (int i = 0; i < str.length(); i++) {\n    result = str.charAt(i) + result;\n  }\n  return result;\n}",
+                "correctAnswer": "public String reverse(String str) {\n  String result = \"\";\n  for (int i = str.length() - 1; i >= 0; i--) {\n    result += str.charAt(i);\n  }\n  return result;\n}",
+                "explanation": "The original code was building the string in the wrong order. This version correctly iterates from the end to the start."
+            },
+            {
+                "type": "debug",
+                "difficulty": "hard",
+                "question": "Fix the following code that should check if a number is prime:",
+                "code": "public boolean isPrime(int num) {\n  if (num <= 1) return false;\n  for (int i = 2; i < num; i++) {\n    if (num % i == 0) return true;\n  }\n  return false;\n}",
+                "correctAnswer": "public boolean isPrime(int num) {\n  if (num <= 1) return false;\n  for (int i = 2; i < num; i++) {\n    if (num % i == 0) return false;\n  }\n  return true;\n}",
+                "explanation": "The original code returned true when a factor was found (meaning it's not prime) and false when no factors were found (meaning it is prime). This logic was reversed."
+            },
+            {
+                "type": "debug",
+                "difficulty": "hard",
+                "question": "Debug the following binary search implementation:",
+                "code": "public int binarySearch(int[] arr, int target) {\n  int left = 0;\n  int right = arr.length;\n  while (left < right) {\n    int mid = (left + right) / 2;\n    if (arr[mid] == target) return mid;\n    if (arr[mid] < target) left = mid;\n    else right = mid;\n  }\n  return -1;\n}",
+                "correctAnswer": "public int binarySearch(int[] arr, int target) {\n  int left = 0;\n  int right = arr.length - 1;\n  while (left <= right) {\n    int mid = left + (right - left) / 2;\n    if (arr[mid] == target) return mid;\n    if (arr[mid] < target) left = mid + 1;\n    else right = mid - 1;\n  }\n  return -1;\n}",
+                "explanation": "Several issues: 1) right should be length-1, 2) loop condition should be <=, 3) need to adjust left/right by +1/-1 to avoid infinite loop, 4) better mid calculation to avoid overflow."
+            }
+        ],
+        "code": [
+            {
+                "type": "code",
+                "difficulty": "easy",
+                "question": "Write a method that calculates the sum of two numbers.",
+                "inputDescription": "Two integers a and b",
+                "outputDescription": "Sum of a and b",
+                "testCases": [
+                    {"input": [5, 3], "output": 8},
+                    {"input": [-1, 1], "output": 0},
+                    {"input": [0, 0], "output": 0}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "easy",
+                "question": "Write a method that checks if a number is even.",
+                "inputDescription": "An integer num",
+                "outputDescription": "true if num is even, false otherwise",
+                "testCases": [
+                    {"input": [4], "output": true},
+                    {"input": [7], "output": false},
+                    {"input": [0], "output": true}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "medium",
+                "question": "Write a method that reverses a given string.",
+                "inputDescription": "A string to reverse (e.g., 'hello')",
+                "outputDescription": "The reversed string (e.g., 'olleh')",
+                "testCases": [
+                    {"input": ["hello"], "output": "olleh"},
+                    {"input": ["world"], "output": "dlrow"},
+                    {"input": [""], "output": ""}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "medium",
+                "question": "Write a method that calculates the factorial of a number.",
+                "inputDescription": "A non-negative integer n",
+                "outputDescription": "Factorial of n (n!)",
+                "testCases": [
+                    {"input": [5], "output": 120},
+                    {"input": [3], "output": 6},
+                    {"input": [0], "output": 1}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "hard",
+                "question": "Create a simple calculator class with add, subtract, multiply, and divide methods.",
+                "inputDescription": "Two numbers and an operation ('add', 'subtract', 'multiply', 'divide')",
+                "outputDescription": "Result of the operation or error message for division by zero",
+                "testCases": [
+                    {"input": [5, 3, "add"], "output": 8},
+                    {"input": [10, 2, "divide"], "output": 5},
+                    {"input": [7, 0, "divide"], "output": "Cannot divide by zero"}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "hard",
+                "question": "Implement a method that checks if a string is a palindrome.",
+                "inputDescription": "A string to check",
+                "outputDescription": "true if the string is a palindrome, false otherwise",
+                "testCases": [
+                    {"input": ["madam"], "output": true},
+                    {"input": ["racecar"], "output": true},
+                    {"input": ["hello"], "output": false}
+                ]
+            }
+        ]
+    },
+    "JAVA23B": {
+        "name": "Set B",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which of these is a primitive data type in Java?",
+                "options": [
+                    "String",
+                    "Array",
+                    "int",
+                    "Object"
+                ],
+                "correctAnswer": 2,
+                "explanation": "'int' is a primitive data type in Java, while the others are reference types."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which symbol is used to end a statement in Java?",
+                "options": [
+                    ";",
+                    ":",
+                    ".",
+                    ","
+                ],
+                "correctAnswer": 0,
+                "explanation": "The semicolon (;) is used to terminate statements in Java."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which of these is not a Java keyword?",
+                "options": [
+                    "class",
+                    "if",
+                    "then",
+                    "new"
+                ],
+                "correctAnswer": 2,
+                "explanation": "'then' is not a Java keyword, though it's used in other languages like Python."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which access modifier makes a member visible only within its own class?",
+                "options": [
+                    "private",
+                    "protected",
+                    "public",
+                    "default"
+                ],
+                "correctAnswer": 0,
+                "explanation": "The 'private' modifier provides the most restrictive access, only within the same class."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which keyword is used to stop a loop?",
+                "options": [
+                    "break",
+                    "stop",
+                    "return",
+                    "exit"
+                ],
+                "correctAnswer": 0,
+                "explanation": "The 'break' statement is used to exit a loop prematurely."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which method must be implemented for a Runnable interface?",
+                "options": [
+                    "start()",
+                    "run()",
+                    "main()",
+                    "execute()"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The Runnable interface requires implementing the run() method."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which of these is a valid interface declaration?",
+                "options": [
+                    "interface A {}",
+                    "class A implements interface {}",
+                    "interface = A{}",
+                    "implements interface A{}"
+                ],
+                "correctAnswer": 0,
+                "explanation": "The correct syntax for declaring an interface is 'interface InterfaceName {}'."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which keyword is used to define an abstract method?",
+                "options": [
+                    "static",
+                    "void",
+                    "abstract",
+                    "public"
+                ],
+                "correctAnswer": 2,
+                "explanation": "The 'abstract' keyword is used to declare abstract methods."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which method wakes up a waiting thread?",
+                "options": [
+                    "run()",
+                    "notify()",
+                    "wait()",
+                    "sleep()"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The notify() method wakes up a single thread that is waiting on the object's monitor."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which of the following handles memory cleanup in Java?",
+                "options": [
+                    "Compiler",
+                    "Garbage Collector",
+                    "Destructor",
+                    "Cleaner"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The Garbage Collector automatically handles memory management in Java."
+            }
+        ],
+        "debug": [
+            {
+                "type": "debug",
+                "difficulty": "easy",
+                "question": "Fix the following code that calculates the area of a rectangle:",
+                "code": "public int area(int length, int width) {\n  return length + width;\n}",
+                "correctAnswer": "public int area(int length, int width) {\n  return length * width;\n}",
+                "explanation": "The original code was adding the dimensions instead of multiplying them."
+            },
+            {
+                "type": "debug",
+                "difficulty": "medium",
+                "question": "Debug the following code that finds the maximum of three numbers:",
+                "code": "public int max(int a, int b, int c) {\n  int max = a;\n  if (b > a) max = b;\n  if (c > b) max = c;\n  return max;\n}",
+                "correctAnswer": "public int max(int a, int b, int c) {\n  int max = a;\n  if (b > max) max = b;\n  if (c > max) max = c;\n  return max;\n}",
+                "explanation": "The original code compared c only with b, not with the current max value."
+            },
+            {
+                "type": "debug",
+                "difficulty": "hard",
+                "question": "Fix the following implementation of bubble sort:",
+                "code": "public void bubbleSort(int[] arr) {\n  for (int i = 0; i < arr.length; i++) {\n    for (int j = 0; j < arr.length; j++) {\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n  }\n}",
+                "correctAnswer": "public void bubbleSort(int[] arr) {\n  for (int i = 0; i < arr.length - 1; i++) {\n    for (int j = 0; j < arr.length - i - 1; j++) {\n      if (arr[j] > arr[j+1]) {\n        int temp = arr[j];\n        arr[j] = arr[j+1];\n        arr[j+1] = temp;\n      }\n    }\n  }\n}",
+                "explanation": "Several fixes: 1) outer loop should go to length-1, 2) inner loop should go to length-i-1 to avoid unnecessary comparisons, 3) fixed potential array index out of bounds."
+            }
+        ],
+        "code": [
+            {
+                "type": "code",
+                "difficulty": "easy",
+                "question": "Write a method that returns the larger of two numbers.",
+                "inputDescription": "Two integers a and b",
+                "outputDescription": "The larger of the two numbers",
+                "testCases": [
+                    {"input": [5, 3], "output": 5},
+                    {"input": [-1, 1], "output": 1},
+                    {"input": [0, 0], "output": 0}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "medium",
+                "question": "Write a method that calculates the nth Fibonacci number.",
+                "inputDescription": "A non-negative integer n",
+                "outputDescription": "The nth Fibonacci number",
+                "testCases": [
+                    {"input": [0], "output": 0},
+                    {"input": [1], "output": 1},
+                    {"input": [6], "output": 8}
+                ]
+            },
+            {
+                "type": "code",
+                "difficulty": "hard",
+                "question": "Implement a method that finds all prime numbers up to a given limit using the Sieve of Eratosthenes algorithm.",
+                "inputDescription": "An integer limit",
+                "outputDescription": "List of prime numbers up to the limit",
+                "testCases": [
+                    {"input": [10], "output": [2, 3, 5, 7]},
+                    {"input": [20], "output": [2, 3, 5, 7, 11, 13, 17, 19]},
+                    {"input": [1], "output": []}
+                ]
+            }
+        ]
+    }
+}

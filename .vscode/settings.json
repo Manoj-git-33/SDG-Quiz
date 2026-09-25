@@ -1,0 +1,7 @@
+{
+    "liveServer.settings.port": 3004,
+    "liveServer.settings.host": "0.0.0.0",
+    "liveServer.settings.useLocalIp": true,
+    "liveServer.settings.wait": 0,
+    "liveServer.settings.reloadOnSave": false
+}

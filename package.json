@@ -1,0 +1,23 @@
+{
+  "name": "quiz-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^4.21.2",
+    "fs-extra": "^11.3.0",
+    "socket.io": "^4.8.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "connect-history-api-fallback": "^2.0.0",
+    "lite-server": "^2.6.1"
+  }
+}

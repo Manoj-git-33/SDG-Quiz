@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kahoot Live Quiz - Gaming Host Presenter</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body class="host-body gaming-theme">
+  <canvas id="confettiCanvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:9999;"></canvas>
+
+  <div class="host-container">
+    
+    <!-- 🟢 TOP HOST HEADER -->
+    <header class="host-header-gaming">
+      <div class="brand">
+        <span class="brand-icon-gaming">⚡</span>
+        <span class="brand-title-gaming">The Cafe Live Quiz</span>
+      </div>
+      <!--<div class="host-controls">
+        <button id="soundToggleBtn" class="control-pill-gaming" onclick="HostApp.toggleSound()" title="Toggle Sound">
+          <i class="fa-solid fa-volume-high"></i> Sound On
+        </button>
+        <button class="control-pill-gaming" onclick="HostApp.toggleFullscreen()" title="Toggle Fullscreen">
+          <i class="fa-solid fa-expand"></i> Fullscreen
+        </button>
+        <span class="host-badge-gaming"><i class="fa-solid fa-user-gear"></i> HOST PRESENTER</span>
+      </div>-->
+    </header>
+
+    <!-- 1️⃣ GAME SETUP STAGE (MATCHING EXACT GAMING IMAGE MOCKUP) -->
+    <div id="hostSetupStage" class="host-card setup-card-gaming">
+      <div class="setup-header-gaming">
+        <div class="header-left">
+          <div class="badge-icon-rocket">🚀</div>
+          <div class="header-text-gaming">
+            <h2>Launch <span class="cyan-text">Kahoot</span> <span class="yellow-text">Live Quiz</span></h2>
+            <!--<p class="subtitle-gaming">Set up your game configuration for the big screen. Players will join using a 4-digit PIN on their phones.</p>-->
+          </div>
+        </div>
+      </div>
+      
+      <div class="gaming-form-grid">
+        <!-- Question Set Box -->
+        <div class="gaming-box box-neon-blue">
+          <div class="box-icon icon-neon-blue"><i class="fa-solid fa-book-bookmark"></i></div>
+          <div class="box-content">
+            <label for="setSelect" class="gaming-box-title">Question Set</label>
+            <span class="gaming-box-desc">Choose which set of questions to use</span>
+            <div class="select-wrapper">
+              <select id="setSelect" class="gaming-select"></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Time Per Question Box -->
+        <div class="gaming-box box-neon-magenta">
+          <div class="box-icon icon-neon-magenta"><i class="fa-solid fa-clock"></i></div>
+          <div class="box-content">
+            <label for="timeSelect" class="gaming-box-title">Time Per Question</label>
+            <span class="gaming-box-desc">Set how much time players get to answer</span>
+            <div class="select-wrapper">
+              <select id="timeSelect" class="gaming-select">
+                <option value="10">10 Seconds (Fast)</option>
+                <option value="15">15 Seconds</option>
+                <option value="20" selected>20 Seconds (Standard)</option>
+                <option value="30">30 Seconds</option>
+                <option value="45">45 Seconds</option>
+                <option value="60">60 Seconds (Hard)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Count Box -->
+        <div class="gaming-box box-neon-green full-width">
+          <div class="box-icon icon-neon-green"><i class="fa-solid fa-list-check"></i></div>
+          <div class="box-content">
+            <label for="limitSelect" class="gaming-box-title">Question Count</label>
+            <span class="gaming-box-desc">Select how many questions to include</span>
+            <div class="select-wrapper">
+              <select id="limitSelect" class="gaming-select">
+                <option value="0" selected>All Questions in Set</option>
+                <option value="5">First 5 Questions</option>
+                <option value="10">First 10 Questions</option>
+                <option value="15">First 15 Questions</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shuffle Toggle Box 
+        <div class="gaming-box box-neon-purple full-width checkbox-box">
+          <label class="gaming-checkbox-label">
+            <input type="checkbox" id="shuffleQuestionsToggle" checked>
+            <span class="gaming-checkbox-btn"><i class="fa-solid fa-check"></i></span>
+            <div class="toggle-text-block">
+              <div class="gaming-toggle-title"><i class="fa-solid fa-shuffle"></i> <strong>Shuffle Questions Order</strong></div>
+              <span class="gaming-box-desc">Questions will appear in random order for all players.</span>
+            </div>
+          </label>
+        </div>
+      </div>-->
+
+      <div class="action-bar-gaming">
+        <button class="btn-create-gaming" onclick="HostApp.createGame()">
+          ▶ Create Game Room ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- 2️⃣ LIVE LOBBY STAGE -->
+    <div id="hostLobbyStage" class="host-card setup-card-gaming" style="display: none;">
+      <div class="pin-banner-gaming">
+        <div class="pin-instructions-gaming">Open <strong>/player.html</strong> on any phone & enter Game PIN:</div>
+        <div id="hostPinDisplay" class="pin-code-gaming">----</div>
+      </div>
+
+      <div class="lobby-meta">
+        <h3 class="cyan-text"><i class="fa-solid fa-users"></i> Connected Players (<span id="playerCount">0</span>)</h3>
+        <p class="subtitle-gaming">Click on any player badge to remove them from the lobby.</p>
+      </div>
+
+      <div id="playerList" class="player-grid"></div>
+
+      <div class="action-bar-gaming margin-top">
+        <button id="startBtn" class="btn-create-gaming pulse-glow" onclick="HostApp.startGame()" disabled>
+          ▶ Start Quiz Game 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- 3️⃣ ACTIVE QUESTION STAGE -->
+    <div id="hostQuestionStage" style="display: none;">
+      <div class="question-top-bar">
+        <div id="qIndexDisplay" class="q-index-pill-gaming">Question 1</div>
+        
+        <div class="timer-circle-gaming">
+          <span id="timerNum">20</span>
+        </div>
+
+        <div class="answered-pill-gaming">
+          <i class="fa-solid fa-paper-plane"></i> <span id="answeredCount">0</span> / <span id="totalPlayersCount">0</span> Answered
+        </div>
+
+        <button class="btn-skip-gaming" onclick="HostApp.skipTimer()" title="Force Reveal Results">
+          ⏩ Skip Timer
+        </button>
+      </div>
+
+      <div class="question-box-gaming">
+        <h1 id="questionText">Loading Question...</h1>
+      </div>
+
+      <!-- 4 KAHOOT COLORED OPTION CARDS -->
+      <div id="hostOptionsGrid" class="options-grid"></div>
+    </div>
+
+    <!-- 4️⃣ RESULT & STATS STAGE (BAR CHART + FASTEST ANSWER) -->
+    <div id="hostResultStage" style="display: none;">
+      <div class="result-header">
+        <h2 id="resQuestionText" class="yellow-text">Question Results</h2>
+        <p id="resExplanation" class="explanation-box-gaming"></p>
+      </div>
+
+      <!-- ⚡ FASTEST CORRECT ANSWER BANNER -->
+      <div id="fastestPlayerBox" class="fastest-banner-gaming" style="display: none;"></div>
+
+      <!-- 📊 LIVE OPTION DISTRIBUTION BAR CHART -->
+      <div class="chart-section-gaming">
+        <h3 class="cyan-text"><i class="fa-solid fa-chart-column"></i> Option Distribution</h3>
+        <div id="barChartContainer" class="bar-chart-grid"></div>
+      </div>
+
+      <div class="action-bar-gaming margin-top">
+        <button class="btn-create-gaming" onclick="HostApp.showLeaderboard()">
+          ▶ Show Leaderboard ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- 5️⃣ LEADERBOARD STAGE -->
+    <div id="hostLeaderboardStage" style="display: none;">
+      <div class="leaderboard-header">
+        <h2 class="yellow-text">🏆 Leaderboard</h2>
+      </div>
+
+      <div id="leaderboardList" class="leaderboard-container"></div>
+
+      <div class="action-bar-gaming margin-top">
+        <button id="nextQBtn" class="btn-create-gaming" onclick="HostApp.nextQuestion()">
+          ▶ Next Question ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- 6️⃣ GAME OVER STAGE (PODIUM) -->
+    <div id="hostGameOverStage" style="display: none;">
+      <div class="game-over-header">
+        <h1 class="yellow-text">🎉 Game Completed!</h1>
+        <p class="subtitle-gaming">Congratulations to the top performers!</p>
+      </div>
+
+      <div id="podiumContainer" class="podium-wrapper"></div>
+
+      <div class="scoreboard-section-gaming margin-top">
+        <h3 class="cyan-text">Full Player Scoreboard</h3>
+        <table class="table-scoreboard-gaming">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player Name</th>
+              <th>Roll No</th>
+              <th>Total Score</th>
+              <th>Correct Answers</th>
+            </tr>
+          </thead>
+          <tbody id="fullScoreboardBody"></tbody>
+        </table>
+      </div>
+
+      <div class="action-bar-gaming margin-top">
+        <button class="btn-create-gaming" onclick="window.location.reload()">
+          🔄 Host Another Quiz
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    if (typeof io === 'undefined') {
+      console.warn('Local socket.io.js failed to load, trying CDN fallback...');
+      document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');
+    }
+  </script>
+  <script src="live-quiz.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof HostApp !== 'undefined') {
+        HostApp.init();
+      }
+    });
+  </script>
+</body>
+</html>

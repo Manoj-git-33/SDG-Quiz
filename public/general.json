@@ -1,0 +1,134 @@
+{
+    "GKINDIA1": {
+        "name": "India General Knowledge Set 1",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which is the national animal of India?",
+                "options": [
+                    "Lion",
+                    "Elephant",
+                    "Tiger",
+                    "Peacock"
+                ],
+                "correctAnswer": 2,
+                "explanation": "The Bengal Tiger is the national animal of India, declared in 1973."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "What is the capital of India?",
+                "options": [
+                    "Mumbai",
+                    "Kolkata",
+                    "New Delhi",
+                    "Chennai"
+                ],
+                "correctAnswer": 2,
+                "explanation": "New Delhi is the capital of India, officially the National Capital Territory of Delhi."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which river is considered the most sacred in India?",
+                "options": [
+                    "Yamuna",
+                    "Ganga",
+                    "Brahmaputra",
+                    "Godavari"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The Ganges (Ganga) is considered the most sacred river in Hinduism."
+            }
+        ]
+    },
+    "GKINDIA2": {
+        "name": "India General Knowledge Set 2",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which Indian city is known as the 'Pink City'?",
+                "options": [
+                    "Jaipur",
+                    "Jodhpur",
+                    "Udaipur",
+                    "Bikaner"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Jaipur is known as the Pink City due to the dominant color scheme of its buildings."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Who was India's first Prime Minister?",
+                "options": [
+                    "Mahatma Gandhi",
+                    "Jawaharlal Nehru",
+                    "Sardar Patel",
+                    "Rajendra Prasad"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Jawaharlal Nehru served as India's first Prime Minister from 1947 to 1964."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which of these is not one of India's classical dance forms?",
+                "options": [
+                    "Bharatanatyam",
+                    "Kathak",
+                    "Bhangra",
+                    "Kuchipudi"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Bhangra is a folk dance from Punjab, not one of the eight recognized classical dance forms of India."
+            }
+        ]
+    },
+    "GKINDIA3": {
+        "name": "India General Knowledge Set 3",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which Indian state has the longest coastline?",
+                "options": [
+                    "Kerala",
+                    "Tamil Nadu",
+                    "Gujarat",
+                    "Andhra Pradesh"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Gujarat has the longest coastline of about 1,600 km among Indian states."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "The Indian Space Research Organisation (ISRO) was founded in which year?",
+                "options": [
+                    "1947",
+                    "1969",
+                    "1972",
+                    "1984"
+                ],
+                "correctAnswer": 1,
+                "explanation": "ISRO was founded on August 15, 1969, succeeding the Indian National Committee for Space Research (INCOSPAR)."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which ancient Indian text is considered the world's first treatise on medicine?",
+                "options": [
+                    "Arthashastra",
+                    "Charaka Samhita",
+                    "Sushruta Samhita",
+                    "Natya Shastra"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Charaka Samhita, written by Charaka, is considered the first complete medical text, dating back to 300 BCE-200 CE."
+            }
+        ]
+    }
+}
