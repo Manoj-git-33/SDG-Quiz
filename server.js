@@ -118,6 +118,39 @@ app.get('/api/question-sets', async (req, res) => {
   }
 });
 
+// Endpoint for complete student list & admin dashboard
+app.get('/api/dashboard', async (req, res) => {
+  try {
+    const historical = await fs.readJson(DATA_FILE).catch(() => []);
+    
+    // Active live room info & connected students
+    const activeRooms = Object.values(games).map(g => ({
+      pin: g.pin,
+      state: g.state,
+      setKey: g.setKey,
+      totalQuestions: g.questions.length,
+      currentQuestionIndex: g.currentQuestionIndex,
+      playersCount: Object.keys(g.players).length,
+      players: Object.values(g.players).map(p => ({
+        id: p.id,
+        name: p.name,
+        roll: p.roll,
+        character: p.character || { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' },
+        score: p.score,
+        totalCorrect: p.totalCorrect
+      }))
+    }));
+
+    res.json({
+      activeRooms: activeRooms,
+      historical: historical
+    });
+  } catch (err) {
+    console.error('Error loading dashboard data:', err);
+    res.status(500).json({ error: 'Failed to load dashboard data' });
+  }
+});
+
 // Submit student quiz result (legacy API)
 app.post('/api/submit', async (req, res) => {
   try {
@@ -335,11 +368,83 @@ io.on('connection', (socket) => {
     }
   });
 
+const FF_CHARACTERS_LIST = [
+  { id: 'alok', name: 'Alok', title: 'Drop The Beat', avatar: '/avatars/alok.jpg', color: '#00d2ff' },
+  { id: 'chrono', name: 'Chrono', title: 'Time Shield', avatar: '/avatars/chrono.jpg', color: '#3b82f6' },
+  { id: 'kelly', name: 'Kelly', title: 'Swift Dash', avatar: '/avatars/kelly.jpg', color: '#ffe600' },
+  { id: 'hayato', name: 'Hayato', title: 'Bushido Samurai', avatar: '/avatars/hayato.jpg', color: '#ff007f' },
+  { id: 'moco', name: 'Moco', title: "Hacker's Eye", avatar: '/avatars/moco.jpg', color: '#a855f7' },
+  { id: 'skyler', name: 'Skyler', title: 'Riptide Rhythm', avatar: '/avatars/skyler.jpg', color: '#00ff88' },
+  { id: 'wukong', name: 'Wukong', title: 'Camouflage', avatar: '/avatars/wukong.jpg', color: '#eab308' },
+  { id: 'maxim', name: 'Maxim', title: 'Glutton Speed', avatar: '/avatars/maxim.jpg', color: '#f97316' },
+  { id: 'k', name: 'K', title: 'Master of All', avatar: '/avatars/k.jpg', color: '#ec4899' },
+  { id: 'dimitri', name: 'Dimitri', title: 'Healing Pulse', avatar: '/avatars/dimitri.jpg', color: '#10b981' },
+  { id: 'a124', name: 'A124', title: 'Thrill of Battle', avatar: '/avatars/a124.jpg', color: '#38bdf8' },
+  { id: 'alvaro', name: 'Alvaro', title: 'Artillery Blow', avatar: '/avatars/alvaro.jpg', color: '#ef4444' },
+  { id: 'caroline', name: 'Caroline', title: 'Agility Speed', avatar: '/avatars/caroline.jpg', color: '#f472b6' },
+  { id: 'clu', name: 'Clu', title: 'Tracing Steps', avatar: '/avatars/clu.jpg', color: '#fbbf24' },
+  { id: 'dasha', name: 'Dasha', title: 'Partying On', avatar: '/avatars/dasha.jpg', color: '#c084fc' },
+  { id: 'homer', name: 'Homer', title: 'Senses Shock', avatar: '/avatars/homer.jpg', color: '#94a3b8' },
+  { id: 'ignis', name: 'Ignis', title: 'Flame Barrier', avatar: '/avatars/ignis.jpg', color: '#f97316' },
+  { id: 'iris', name: 'Iris', title: 'Gloo Wall Mark', avatar: '/avatars/iris.jpg', color: '#38bdf8' },
+  { id: 'jai', name: 'Jai', title: 'Raging Reload', avatar: '/avatars/jai.jpg', color: '#3b82f6' },
+  { id: 'joseph', name: 'Joseph', title: 'Nutty Movement', avatar: '/avatars/joseph.jpg', color: '#a855f7' },
+  { id: 'kairos', name: 'Kairos', title: 'Defense Break', avatar: '/avatars/kairos.jpg', color: '#6366f1' },
+  { id: 'kapella', name: 'Kapella', title: 'Healing Song', avatar: '/avatars/kapella.jpg', color: '#ec4899' },
+  { id: 'kassie', name: 'Kassie', title: 'Electro Pulse', avatar: '/avatars/kassie.jpg', color: '#00ff88' },
+  { id: 'kenta', name: 'Kenta', title: 'Swordsman Shield', avatar: '/avatars/kenta.jpg', color: '#38bdf8' },
+  { id: 'kla', name: 'Kla', title: 'Muay Thai Fist', avatar: '/avatars/kla.jpg', color: '#b45309' },
+  { id: 'koda', name: 'Koda', title: 'Wild Tracker', avatar: '/avatars/koda.jpg', color: '#eab308' },
+  { id: 'laura', name: 'Laura', title: 'Sharp Shooter', avatar: '/avatars/laura.jpg', color: '#00d2ff' },
+  { id: 'leon', name: 'Leon', title: 'Buzzer Beater', avatar: '/avatars/leon.jpg', color: '#f59e0b' },
+  { id: 'lila', name: 'Lila', title: 'Gloo Wall Trap', avatar: '/avatars/lila.jpg', color: '#a855f7' },
+  { id: 'luna', name: 'Luna', title: 'Fight or Flight', avatar: '/avatars/luna.jpg', color: '#f472b6' },
+  { id: 'maro', name: 'Maro', title: 'Falcon Fervor', avatar: '/avatars/maro.jpg', color: '#f97316' },
+  { id: 'misha', name: 'Misha', title: 'Afterburner Driver', avatar: '/avatars/misha.jpg', color: '#eab308' },
+  { id: 'mose', name: 'Mose', title: 'Stealth Shadow', avatar: '/avatars/mose.jpg', color: '#64748b' },
+  { id: 'nero', name: 'Nero', title: 'Phantom Strike', avatar: '/avatars/nero.jpg', color: '#ef4444' },
+  { id: 'nikita', name: 'Nikita', title: 'Firearms Expert', avatar: '/avatars/nikita.jpg', color: '#38bdf8' },
+  { id: 'notora', name: 'Notora', title: "Racer's Blessing", avatar: '/avatars/notora.jpg', color: '#a855f7' },
+  { id: 'olivia', name: 'Olivia', title: 'Healing Touch', avatar: '/avatars/olivia.jpg', color: '#10b981' },
+  { id: 'orion', name: 'Orion', title: 'Crimson Energy', avatar: '/avatars/orion.jpg', color: '#dc2626' },
+  { id: 'oscar', name: 'Oscar', title: 'Tactical Recon', avatar: '/avatars/oscar.jpg', color: '#6366f1' },
+  { id: 'otho', name: 'Otho', title: 'Memory Mist', avatar: '/avatars/otho.jpg', color: '#3b82f6' },
+  { id: 'paloma', name: 'Paloma', title: 'Arms Dealer', avatar: '/avatars/paloma.jpg', color: '#be123c' },
+  { id: 'rafael', name: 'Rafael', title: 'Dead Silent', avatar: '/avatars/rafael.jpg', color: '#334155' },
+  { id: 'ray', name: 'Ray', title: 'Solar Flare', avatar: '/avatars/ray.jpg', color: '#ffe600' },
+  { id: 'rin', name: 'Rin', title: 'Vanguard Shield', avatar: '/avatars/rin.jpg', color: '#00ff88' },
+  { id: 'ryden', name: 'Ryden', title: 'Spider Trap', avatar: '/avatars/ryden.jpg', color: '#84cc16' },
+  { id: 'santino', name: 'Santino', title: 'Shape Splitter', avatar: '/avatars/santino.jpg', color: '#f43f5e' },
+  { id: 'shani', name: 'Shani', title: 'Gear Recycle', avatar: '/avatars/shani.jpg', color: '#38bdf8' },
+  { id: 'shirou', name: 'Shirou', title: 'Damage Delivered', avatar: '/avatars/shirou.jpg', color: '#f97316' },
+  { id: 'steffie', name: 'Steffie', title: 'Painted Refuge', avatar: '/avatars/steffie.jpg', color: '#ec4899' },
+  { id: 'suzy', name: 'Suzy', title: 'Bounty Hunter', avatar: '/avatars/suzy.jpg', color: '#eab308' },
+  { id: 'tatsuya', name: 'Tatsuya', title: 'Rebel Rush', avatar: '/avatars/tatsuya.jpg', color: '#00d2ff' },
+  { id: 'xayne', name: 'Xayne', title: 'Extreme Encounter', avatar: '/avatars/xayne.jpg', color: '#f43f5e' }
+];
+
+function getCharacterData(charId, index = 0) {
+  let found = FF_CHARACTERS_LIST.find(c => c.id === (charId || '').toLowerCase());
+  if (!found) {
+    found = FF_CHARACTERS_LIST[index % FF_CHARACTERS_LIST.length];
+  }
+  const avatarPathOnDisk = path.join(PUBLIC_DIR, found.avatar.replace(/^\//, ''));
+  if (!fs.existsSync(avatarPathOnDisk)) {
+    const pngPath = avatarPathOnDisk.replace(/\.jpg$/, '.png');
+    if (fs.existsSync(pngPath)) {
+      return { ...found, avatar: found.avatar.replace(/\.jpg$/, '.png') };
+    }
+    return { ...found, avatar: '/avatars/alok.jpg' };
+  }
+  return found;
+}
+
   // 2. Player joins game
   socket.on('player-join-game', (data) => {
     const pin = (data.pin || '').toString().trim();
     const name = (data.name || '').trim();
     const roll = (data.roll || '').trim();
+    const charId = (data.characterId || '').trim();
 
     const game = games[pin];
     if (!game) {
@@ -355,10 +460,14 @@ io.on('connection', (socket) => {
       return socket.emit('join-error', { message: 'Name already taken in this room. Pick another name!' });
     }
 
+    const currentCount = Object.keys(game.players).length;
+    const charData = getCharacterData(charId, currentCount);
+
     game.players[socket.id] = {
       id: socket.id,
       name: name,
       roll: roll,
+      character: charData,
       score: 0,
       totalCorrect: 0
     };
@@ -367,10 +476,16 @@ io.on('connection', (socket) => {
     socket.emit('player-joined-success', {
       pin: pin,
       name: name,
+      character: charData,
       message: 'Successfully joined game lobby!'
     });
 
-    const playerList = Object.values(game.players).map(p => ({ id: p.id, name: p.name, roll: p.roll }));
+    const playerList = Object.values(game.players).map(p => ({
+      id: p.id,
+      name: p.name,
+      roll: p.roll,
+      character: p.character
+    }));
     io.to(game.hostSocketId).emit('player-list-update', {
       players: playerList,
       count: playerList.length
@@ -387,7 +502,12 @@ io.on('connection', (socket) => {
       io.to(playerId).emit('kicked-from-game', { message: 'You were removed from the lobby by the host.' });
       delete game.players[playerId];
 
-      const playerList = Object.values(game.players).map(p => ({ id: p.id, name: p.name, roll: p.roll }));
+      const playerList = Object.values(game.players).map(p => ({
+        id: p.id,
+        name: p.name,
+        roll: p.roll,
+        character: p.character
+      }));
       io.to(game.hostSocketId).emit('player-list-update', {
         players: playerList,
         count: playerList.length
@@ -471,8 +591,7 @@ io.on('connection', (socket) => {
 
     let pointsEarned = 0;
     if (isCorrect) {
-      const speedFactor = Math.max(0.5, 1 - (timeTakenSec / game.timePerQuestion));
-      pointsEarned = Math.round(1000 * speedFactor);
+      pointsEarned = 1000;
       player.score += pointsEarned;
       player.totalCorrect += 1;
     }
@@ -517,6 +636,7 @@ io.on('connection', (socket) => {
         rank: idx + 1,
         name: p.name,
         roll: p.roll,
+        character: p.character,
         score: p.score,
         totalCorrect: p.totalCorrect
       }));
@@ -552,6 +672,7 @@ io.on('connection', (socket) => {
           rank: idx + 1,
           name: p.name,
           roll: p.roll,
+          character: p.character,
           score: p.score,
           totalCorrect: p.totalCorrect
         }));
@@ -570,7 +691,12 @@ io.on('connection', (socket) => {
       const game = games[pin];
       if (game.players[socket.id]) {
         delete game.players[socket.id];
-        const playerList = Object.values(game.players).map(p => ({ id: p.id, name: p.name, roll: p.roll }));
+        const playerList = Object.values(game.players).map(p => ({
+          id: p.id,
+          name: p.name,
+          roll: p.roll,
+          character: p.character
+        }));
         io.to(game.hostSocketId).emit('player-list-update', {
           players: playerList,
           count: playerList.length

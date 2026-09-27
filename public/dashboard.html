@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student List & Results Dashboard - Live Quiz</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=25">
+</head>
+<body class="host-body gaming-theme">
+
+  <div class="dashboard-container">
+    
+    <!-- 🟢 DASHBOARD TOP HEADER -->
+    <header class="host-header-gaming">
+      <div class="brand">
+        <span class="brand-icon-gaming">📊</span>
+        <span class="brand-title-gaming">Student List & Quiz Dashboard</span>
+      </div>
+      <div class="host-controls-gaming">
+        <button onclick="closeOrBackToHost()" class="btn-create-gaming btn-sm-gaming" title="Return to Live Quiz Host View">
+          <i class="fa-solid fa-arrow-left"></i> Back to Host
+        </button>
+        <button class="control-pill-gaming" onclick="loadDashboardData()" title="Refresh Dashboard">
+          <i class="fa-solid fa-rotate"></i> Refresh
+        </button>
+        <button class="control-pill-gaming" onclick="exportToCSV()" title="Export CSV Report">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+        <button class="control-pill-gaming" onclick="window.print()" title="Print Dashboard">
+          <i class="fa-solid fa-print"></i> Print
+        </button>
+      </div>
+    </header>
+
+    <!-- 1️⃣ SUMMARY STATS ROW -->
+    <div class="stats-grid-gaming">
+      <div class="stat-card-gaming box-neon-blue">
+        <div class="stat-icon icon-neon-blue"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Live Connected Students</span>
+          <h2 id="statLiveStudents" class="stat-value cyan-text">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card-gaming box-neon-magenta">
+        <div class="stat-icon icon-neon-magenta"><i class="fa-solid fa-gamepad"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Active Game Rooms</span>
+          <h2 id="statActiveRooms" class="stat-value yellow-text">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card-gaming box-neon-green">
+        <div class="stat-icon icon-neon-green"><i class="fa-solid fa-trophy"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Top Performer</span>
+          <h2 id="statTopPlayer" class="stat-value cyan-text">-</h2>
+        </div>
+      </div>
+
+      <div class="stat-card-gaming box-neon-purple">
+        <div class="stat-icon icon-neon-purple"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Completed Quiz Records</span>
+          <h2 id="statCompletedQuizzes" class="stat-value yellow-text">0</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2️⃣ TABS SELECTOR -->
+    <div class="dashboard-tabs-gaming margin-top">
+      <button id="tabBtnLive" class="tab-btn-gaming active" onclick="switchTab('live')">
+        <i class="fa-solid fa-headset"></i> Live Room Students (<span id="liveTabCount">0</span>)
+      </button>
+      <button id="tabBtnHistory" class="tab-btn-gaming" onclick="switchTab('history')">
+        <i class="fa-solid fa-list-check"></i> Complete Student Results History (<span id="historyTabCount">0</span>)
+      </button>
+    </div>
+
+    <!-- 3️⃣ TAB 1: LIVE ROOM STUDENTS -->
+    <div id="tabContentLive" class="tab-content-gaming host-card setup-card-gaming margin-top">
+      <div class="section-title-row">
+        <h3 class="cyan-text"><i class="fa-solid fa-signal"></i> Currently Connected Students in Live Lobby & Game</h3>
+        <p class="subtitle-gaming">Real-time list of all students currently connected to active quiz rooms on Wi-Fi.</p>
+      </div>
+
+      <div id="liveRoomsContainer"></div>
+    </div>
+
+    <!-- 4️⃣ TAB 2: COMPLETE STUDENT RESULTS HISTORY -->
+    <div id="tabContentHistory" class="tab-content-gaming host-card setup-card-gaming margin-top" style="display: none;">
+      <div class="filter-bar-gaming">
+        <div class="search-box-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="studentSearchInput" class="gaming-input-search" placeholder="Search by Student Name or Roll Number..." oninput="filterHistoricalData()">
+        </div>
+
+        <div class="select-wrapper width-auto">
+          <select id="setFilterSelect" class="gaming-select" onchange="filterHistoricalData()">
+            <option value="ALL" selected>All Question Sets</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive-gaming margin-top">
+        <table class="table-scoreboard-gaming">
+          <thead>
+            <tr>
+              <th>Date / Time</th>
+              <th>Student Profile</th>
+              <th>Roll Number</th>
+              <th>Quiz Set / Round</th>
+              <th>Score</th>
+              <th>Accuracy</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="historicalTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let globalDashboardData = { activeRooms: [], historical: [] };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+      setInterval(loadDashboardData, 4000); // Auto-refresh live data every 4s
+    });
+
+    async function loadDashboardData() {
+      try {
+        const res = await fetch('/api/dashboard');
+        if (res.ok) {
+          globalDashboardData = await res.json();
+          renderDashboard();
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+      }
+    }
+
+    function switchTab(tab) {
+      const liveBtn = document.getElementById('tabBtnLive');
+      const histBtn = document.getElementById('tabBtnHistory');
+      const liveContent = document.getElementById('tabContentLive');
+      const histContent = document.getElementById('tabContentHistory');
+
+      if (tab === 'live') {
+        liveBtn.classList.add('active');
+        histBtn.classList.remove('active');
+        liveContent.style.display = 'block';
+        histContent.style.display = 'none';
+      } else {
+        histBtn.classList.add('active');
+        liveBtn.classList.remove('active');
+        histContent.style.display = 'block';
+        liveContent.style.display = 'none';
+      }
+    }
+
+    function renderDashboard() {
+      const activeRooms = globalDashboardData.activeRooms || [];
+      const historical = globalDashboardData.historical || [];
+
+      // Calculate total live students across rooms
+      let totalLiveStudents = 0;
+      let topScorerName = '-';
+      let maxScore = 0;
+
+      activeRooms.forEach(r => {
+        totalLiveStudents += r.playersCount || 0;
+        (r.players || []).forEach(p => {
+          if (p.score > maxScore) {
+            maxScore = p.score;
+            topScorerName = `${p.name} (${p.score} pts)`;
+          }
+        });
+      });
+
+      // Update Summary Cards
+      document.getElementById('statLiveStudents').textContent = totalLiveStudents;
+      document.getElementById('statActiveRooms').textContent = activeRooms.length;
+      document.getElementById('statCompletedQuizzes').textContent = historical.length;
+      document.getElementById('statTopPlayer').textContent = topScorerName;
+
+      document.getElementById('liveTabCount').textContent = totalLiveStudents;
+      document.getElementById('historyTabCount').textContent = historical.length;
+
+      // Populate Set Filter Dropdown if needed
+      populateSetFilter(historical);
+
+      // Render Live Rooms
+      renderLiveRooms(activeRooms);
+
+      // Render Historical Records
+      filterHistoricalData();
+    }
+
+    function closeOrBackToHost() {
+      if (window.opener || (window.history && window.history.length > 1 && document.referrer.includes('host.html'))) {
+        try { window.close(); } catch (e) {}
+        setTimeout(() => {
+          if (!window.closed) window.history.back();
+        }, 150);
+      } else {
+        window.location.href = 'host.html';
+      }
+    }
+
+    function renderLiveRooms(activeRooms) {
+      const container = document.getElementById('liveRoomsContainer');
+      if (!container) return;
+
+      if (activeRooms.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-gaming">
+            <div class="empty-icon">🎮</div>
+            <h4>No Active Game Rooms Right Now</h4>
+            <p>Host a game from <a href="host.html" class="cyan-text">host.html</a> to see live connected students here!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activeRooms.map(room => {
+        // Sort live room players by score descending
+        const sortedPlayers = [...(room.players || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+        const medals = ['🥇', '🥈', '🥉'];
+
+        return `
+          <div class="room-dashboard-box box-neon-blue margin-top">
+            <div class="room-header-row">
+              <div>
+                <span class="room-badge">ROOM PIN: ${room.pin}</span>
+                <span class="set-badge">${room.setKey}</span>
+                <span class="state-badge">${room.state} STAGE</span>
+              </div>
+              <div class="cyan-text font-bold">
+                Connected Players: ${room.playersCount}
+              </div>
+            </div>
+
+            <div class="player-grid margin-top">
+              ${sortedPlayers.map((p, idx) => {
+                const medal = medals[idx] || `#${idx + 1}`;
+                const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
+                const charName = String(char.name || 'Alok');
+                return `
+                  <div class="gaming-player-card" style="--char-color: ${char.color || '#00d2ff'}">
+                    <div class="char-avatar-wrapper">
+                      <img src="${char.avatar || '/avatars/alok.jpg'}" alt="${escapeHtml(charName)}" class="char-avatar-img" onerror="this.src='/avatars/alok.jpg'">
+                      <span class="char-badge-tag">${medal} ${escapeHtml(charName.toUpperCase())}</span>
+                    </div>
+                    <div class="player-info-block">
+                      <span class="player-name-text">${escapeHtml(p.name || 'Student')}</span>
+                      <span class="player-roll-text">${p.roll ? `Roll: ${escapeHtml(p.roll)} | ` : ''}Points: <strong class="yellow-text" style="font-size: 1.1rem;">${p.score || 0} pts</strong></span>
+                    </div>
+                  </div>
+                `;
+              }).join('') || '<p class="subtitle-gaming">No players joined this room yet.</p>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function populateSetFilter(historical) {
+      const select = document.getElementById('setFilterSelect');
+      if (!select || select.dataset.populated === 'true') return;
+
+      const sets = new Set();
+      historical.forEach(h => {
+        if (h.round) sets.add(h.round);
+      });
+
+      sets.forEach(setName => {
+        const opt = document.createElement('option');
+        opt.value = setName;
+        opt.textContent = setName;
+        select.appendChild(opt);
+      });
+
+      select.dataset.populated = 'true';
+    }
+
+    function filterHistoricalData() {
+      const search = (document.getElementById('studentSearchInput')?.value || '').toLowerCase().trim();
+      const setFilter = document.getElementById('setFilterSelect')?.value || 'ALL';
+      const historical = globalDashboardData.historical || [];
+
+      const tbody = document.getElementById('historicalTableBody');
+      if (!tbody) return;
+
+      const items = [];
+
+      historical.forEach((rec) => {
+        const roundName = rec.round || 'Standard Quiz';
+        if (setFilter !== 'ALL' && roundName !== setFilter) return;
+
+        // If record has detailed players list (Live Kahoot record)
+        if (Array.isArray(rec.results) && rec.results.length > 0) {
+          rec.results.forEach((p) => {
+            const name = (p.name || '').toLowerCase();
+            const roll = (p.roll || '').toLowerCase();
+
+            if (search && !name.includes(search) && !roll.includes(search)) return;
+
+            items.push({
+              dateStr: rec.date ? new Date(rec.date).toLocaleString() : 'Recent',
+              name: p.name,
+              roll: p.roll || 'N/A',
+              roundName: roundName,
+              score: p.score || 0,
+              totalCorrect: p.totalCorrect || 0,
+              character: p.character || { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' }
+            });
+          });
+        } 
+        // Single student record legacy format
+        else {
+          const name = (rec.name || '').toLowerCase();
+          const roll = (rec.roll || '').toLowerCase();
+
+          if (search && !name.includes(search) && !roll.includes(search)) return;
+
+          items.push({
+            dateStr: rec.timestamp || rec.date || 'Recent',
+            name: rec.name || 'Student',
+            roll: rec.roll || 'N/A',
+            roundName: roundName,
+            score: rec.score || rec.totalScore || 0,
+            totalCorrect: rec.totalCorrect || 0,
+            character: { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' }
+          });
+        }
+      });
+
+      // Sort complete student results history by score descending
+      items.sort((a, b) => b.score - a.score);
+
+      if (items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center padding-2rem">
+              <div class="subtitle-gaming">No matching student records found.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const medals = ['🥇', '🥈', '🥉'];
+
+      tbody.innerHTML = items.map((p, idx) => {
+        const medal = medals[idx] || `#${idx + 1}`;
+        const char = p.character;
+
+        return `
+          <tr>
+            <td><small>${p.dateStr}</small></td>
+            <td class="scoreboard-player-cell">
+              <span style="font-weight: 800; font-size: 1.1rem; margin-right: 0.4rem; color: #ffe600;">${medal}</span>
+              <img src="${char.avatar}" class="table-avatar-img" alt="" onerror="this.src='/avatars/alok.jpg'">
+              <div>
+                <strong>${escapeHtml(p.name)}</strong>
+                <div class="cyan-text small-tag">${escapeHtml(char.name)}</div>
+              </div>
+            </td>
+            <td>${escapeHtml(p.roll)}</td>
+            <td><span class="badge-round">${escapeHtml(p.roundName)}</span></td>
+            <td><strong class="yellow-text" style="font-size: 1.15rem;">${p.score} pts</strong></td>
+            <td>${p.totalCorrect ? `${p.totalCorrect} Correct` : 'N/A'}</td>
+            <td>
+              <button class="btn-delete-gaming" onclick="deleteRecord('${p.roll}')" title="Delete Student Record">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function deleteRecord(roll) {
+      if (!roll || roll === 'N/A') return alert('Cannot delete record without valid roll number.');
+      if (!confirm(`Are you sure you want to delete quiz records for Roll No: ${roll}?`)) return;
+
+      try {
+        const res = await fetch(`/api/results/${encodeURIComponent(roll)}`, { method: 'DELETE' });
+        if (res.ok) {
+          alert('Student record deleted successfully!');
+          loadDashboardData();
+        } else {
+          alert('Failed to delete record.');
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+      }
+    }
+
+    function exportToCSV() {
+      const historical = globalDashboardData.historical || [];
+      if (historical.length === 0) return alert('No quiz records to export.');
+
+      let csvContent = "data:text/csv;charset=utf-8,Date,Student Name,Roll Number,Quiz Set,Score,Correct Answers\n";
+
+      historical.forEach(rec => {
+        const date = rec.date || rec.timestamp || '';
+        const round = rec.round || '';
+        if (Array.isArray(rec.results)) {
+          rec.results.forEach(p => {
+            csvContent += `"${date}","${p.name}","${p.roll || ''}","${round}","${p.score}","${p.totalCorrect || 0}"\n`;
+          });
+        } else {
+          csvContent += `"${date}","${rec.name || ''}","${rec.roll || ''}","${round}","${rec.score || 0}","${rec.totalCorrect || 0}"\n`;
+        }
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Student_Quiz_Results_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

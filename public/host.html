@@ -6,10 +6,10 @@
   <title>Kahoot Live Quiz - Gaming Host Presenter</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=26">
 </head>
 <body class="host-body gaming-theme">
-  <canvas id="confettiCanvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:9999;"></canvas>
+  <canvas id="confettiCanvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:1;"></canvas>
 
   <div class="host-container">
     
@@ -19,15 +19,14 @@
         <span class="brand-icon-gaming">⚡</span>
         <span class="brand-title-gaming">The Cafe Live Quiz</span>
       </div>
-      <!--<div class="host-controls">
-        <button id="soundToggleBtn" class="control-pill-gaming" onclick="HostApp.toggleSound()" title="Toggle Sound">
-          <i class="fa-solid fa-volume-high"></i> Sound On
+      <div class="host-controls-gaming">
+        <button class="btn-dashboard-gaming" onclick="HostApp.toggleDashboardModal(true)" title="Open Live Student Dashboard Overlay">
+          <i class="fa-solid fa-chart-line"></i> Student Dashboard 📊
         </button>
-        <button class="control-pill-gaming" onclick="HostApp.toggleFullscreen()" title="Toggle Fullscreen">
-          <i class="fa-solid fa-expand"></i> Fullscreen
-        </button>
-        <span class="host-badge-gaming"><i class="fa-solid fa-user-gear"></i> HOST PRESENTER</span>
-      </div>-->
+        <a href="dashboard.html" target="_blank" class="control-pill-gaming" title="Open Full Dashboard in New Tab">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Full Tab ↗
+        </a>
+      </div>
     </header>
 
     <!-- 1️⃣ GAME SETUP STAGE (MATCHING EXACT GAMING IMAGE MOCKUP) -->
@@ -37,7 +36,6 @@
           <div class="badge-icon-rocket">🚀</div>
           <div class="header-text-gaming">
             <h2>Launch <span class="cyan-text">Kahoot</span> <span class="yellow-text">Live Quiz</span></h2>
-            <!--<p class="subtitle-gaming">Set up your game configuration for the big screen. Players will join using a 4-digit PIN on their phones.</p>-->
           </div>
         </div>
       </div>
@@ -50,7 +48,11 @@
             <label for="setSelect" class="gaming-box-title">Question Set</label>
             <span class="gaming-box-desc">Choose which set of questions to use</span>
             <div class="select-wrapper">
-              <select id="setSelect" class="gaming-select"></select>
+              <select id="setSelect" class="gaming-select">
+                <option value="JAVA23A" selected>Set A (Java OOP) (20 Questions)</option>
+                <option value="JAVA23B">Set B (Java Advanced) (10 Questions)</option>
+                <option value="GKINDIA1">India General Knowledge Set 1 (3 Questions)</option>
+              </select>
             </div>
           </div>
         </div>
@@ -90,19 +92,7 @@
             </div>
           </div>
         </div>
-
-        <!-- Shuffle Toggle Box 
-        <div class="gaming-box box-neon-purple full-width checkbox-box">
-          <label class="gaming-checkbox-label">
-            <input type="checkbox" id="shuffleQuestionsToggle" checked>
-            <span class="gaming-checkbox-btn"><i class="fa-solid fa-check"></i></span>
-            <div class="toggle-text-block">
-              <div class="gaming-toggle-title"><i class="fa-solid fa-shuffle"></i> <strong>Shuffle Questions Order</strong></div>
-              <span class="gaming-box-desc">Questions will appear in random order for all players.</span>
-            </div>
-          </label>
-        </div>
-      </div>-->
+      </div>
 
       <div class="action-bar-gaming">
         <button class="btn-create-gaming" onclick="HostApp.createGame()">
@@ -132,51 +122,83 @@
       </div>
     </div>
 
-    <!-- 3️⃣ ACTIVE QUESTION STAGE -->
+    <!-- 3️⃣ ACTIVE QUESTION STAGE (MATCHING EXACT HUD MOCKUP 1:1) -->
     <div id="hostQuestionStage" style="display: none;">
-      <div class="question-top-bar">
-        <div id="qIndexDisplay" class="q-index-pill-gaming">Question 1</div>
+      <div class="question-top-bar-mockup">
+        <!-- Left Chamfered Badge: Question 1 of 20 -->
+        <div id="qIndexDisplay" class="hud-badge-outer hud-left-badge">
+          <div class="hud-badge-inner">
+            <div class="hud-sub-text">Question <span id="qCurrNum">1</span> of</div>
+            <div id="qTotalNum" class="hud-main-text">20</div>
+          </div>
+        </div>
         
-        <div class="timer-circle-gaming">
-          <span id="timerNum">20</span>
+        <!-- Center Glowing Gold Timer Circle -->
+        <div class="timer-circle-mockup">
+          <span id="timerNum">15</span>
         </div>
 
-        <div class="answered-pill-gaming">
-          <i class="fa-solid fa-paper-plane"></i> <span id="answeredCount">0</span> / <span id="totalPlayersCount">0</span> Answered
+        <!-- Right Chamfered Badge: 0 / - Answered -->
+        <div class="hud-badge-outer hud-right-badge">
+          <div class="hud-badge-inner">
+            <div class="hud-top-row">
+              <i class="fa-solid fa-paper-plane cyan-plane-icon"></i>
+              <span id="answeredCount">0</span> / <span id="totalPlayersCount">-</span>
+            </div>
+            <div class="hud-bottom-row">Answered</div>
+          </div>
         </div>
 
-        <button class="btn-skip-gaming" onclick="HostApp.skipTimer()" title="Force Reveal Results">
-          ⏩ Skip Timer
+        <!-- Far-Right Translucent Skip Button -->
+        <button class="btn-skip-mockup" onclick="HostApp.skipTimer()" title="Force Reveal Results">
+          <i class="fa-solid fa-forward-step skip-icon-cyan"></i>
+          <span class="skip-btn-text">Skip<br>Timer</span>
         </button>
       </div>
 
-      <div class="question-box-gaming">
-        <h1 id="questionText">Loading Question...</h1>
+      <!-- Question Text Card (Chamfered Gold Border Box) -->
+      <div class="question-box-mockup-outer">
+        <div class="question-box-mockup-inner">
+          <h1 id="questionText">Which of the following is not an OOP concept in Java?</h1>
+        </div>
       </div>
 
       <!-- 4 KAHOOT COLORED OPTION CARDS -->
       <div id="hostOptionsGrid" class="options-grid"></div>
     </div>
 
-    <!-- 4️⃣ RESULT & STATS STAGE (BAR CHART + FASTEST ANSWER) -->
+    <!-- 4️⃣ RESULT & STATS STAGE (MATCHING MOCKUP 1:1) -->
     <div id="hostResultStage" style="display: none;">
-      <div class="result-header">
-        <h2 id="resQuestionText" class="yellow-text">Question Results</h2>
-        <p id="resExplanation" class="explanation-box-gaming"></p>
+      <!-- Chamfered Gold Question Card with Target Icon 🎯 -->
+      <div class="question-box-mockup-outer margin-bottom-sm">
+        <div class="question-box-mockup-inner display-flex-row">
+          <div class="target-icon-badge"><i class="fa-solid fa-bullseye"></i></div>
+          <h1 id="resQuestionText" class="result-question-title">Which of the following is not an OOP concept in Java?</h1>
+        </div>
+      </div>
+
+      <!-- Explanation Glass Box -->
+      <div id="resExplanationBox" class="explanation-card-mockup" style="display: none;">
+        <p id="resExplanation" class="explanation-text"></p>
       </div>
 
       <!-- ⚡ FASTEST CORRECT ANSWER BANNER -->
-      <div id="fastestPlayerBox" class="fastest-banner-gaming" style="display: none;"></div>
+      <div id="fastestPlayerBox" class="fastest-banner-mockup" style="display: none;"></div>
 
-      <!-- 📊 LIVE OPTION DISTRIBUTION BAR CHART -->
-      <div class="chart-section-gaming">
-        <h3 class="cyan-text"><i class="fa-solid fa-chart-column"></i> Option Distribution</h3>
-        <div id="barChartContainer" class="bar-chart-grid"></div>
+      <!-- 📊 LIVE OPTION DISTRIBUTION POLL CARD -->
+      <div class="poll-distribution-card">
+        <div class="poll-card-header">
+          <i class="fa-solid fa-chart-simple poll-header-icon"></i>
+          <span class="poll-title-main">Option <span class="cyan-text">Distribution</span></span>
+        </div>
+        
+        <div id="barChartContainer" class="poll-chart-grid"></div>
       </div>
 
+      <!-- BOTTOM ACTION BUTTON -->
       <div class="action-bar-gaming margin-top">
-        <button class="btn-create-gaming" onclick="HostApp.showLeaderboard()">
-          ▶ Show Leaderboard ➔
+        <button class="btn-create-gaming btn-gold-chamfer pulse-glow" onclick="HostApp.showLeaderboard()">
+          <i class="fa-solid fa-flag"></i> SHOW LEADERBOARD ➔
         </button>
       </div>
     </div>
@@ -226,6 +248,20 @@
           🔄 Host Another Quiz
         </button>
       </div>
+    <!-- 📊 LIVE IN-PAGE DASHBOARD OVERLAY MODAL -->
+    <div id="hostDashboardModal" class="dashboard-modal-backdrop" style="display: none;">
+      <div class="dashboard-modal-box">
+        <div class="dashboard-modal-header">
+          <h3>📊 Live Student Leaderboard & Connected Dashboard</h3>
+          <div style="display: flex; gap: 0.8rem; align-items: center;">
+            <a href="dashboard.html" target="_blank" class="control-pill-gaming" style="font-size: 0.85rem;" title="Open in Full Tab">Full Page ↗</a>
+            <button class="btn-close-modal" onclick="HostApp.toggleDashboardModal(false)">✕ Close & Resume Game</button>
+          </div>
+        </div>
+        <div class="dashboard-modal-body" id="hostDashboardModalBody">
+          <div class="subtitle-gaming">Loading live student rankings...</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -237,7 +273,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');
     }
   </script>
-  <script src="live-quiz.js"></script>
+  <script src="live-quiz.js?v=31"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof HostApp !== 'undefined') {

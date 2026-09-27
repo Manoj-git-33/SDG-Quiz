@@ -3,119 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kahoot Quiz Player - Join Game</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+  <title>Kahoot Live Player - Join Game</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=29">
 </head>
-<body class="player-body modern-theme">
-  <!-- DECORATIVE VECTOR BACKGROUND ELEMENTS -->
-  <div class="bg-shape plane-shape-player">
-    <svg width="80" height="60" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 40 L90 10 L60 70 L45 45 Z" fill="#3b82f6"/>
-      <path d="M45 45 L90 10 L60 70 Z" fill="#2563eb"/>
-    </svg>
-  </div>
+<body class="player-body mobile-theme">
 
-  <div class="bg-shape student-left">
-    <svg width="140" height="180" viewBox="0 0 140 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Boy student illustration placeholder SVG -->
-      <circle cx="70" cy="50" r="30" fill="#fcd34d"/>
-      <path d="M40 40 C40 20 100 20 100 40 C100 25 70 15 40 40 Z" fill="#1e293b"/>
-      <path d="M30 140 C30 90 110 90 110 140 L110 180 L30 180 Z" fill="#2563eb"/>
-      <rect x="15" y="110" width="30" height="40" rx="6" fill="#fbbf24"/>
-      <rect x="10" y="150" width="120" height="25" rx="8" fill="#3b82f6"/>
-    </svg>
-  </div>
-
-  <div class="bg-shape student-right">
-    <svg width="140" height="180" viewBox="0 0 140 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Girl student illustration placeholder SVG -->
-      <circle cx="70" cy="50" r="30" fill="#fcd34d"/>
-      <path d="M35 50 C35 15 105 15 105 50 C115 80 25 80 35 50 Z" fill="#78350f"/>
-      <path d="M30 140 C30 90 110 90 110 140 L110 180 L30 180 Z" fill="#f59e0b"/>
-      <rect x="50" y="130" width="60" height="35" rx="6" fill="#94a3b8"/>
-    </svg>
-  </div>
-
-  <div class="bg-shape sparkles-right">✨</div>
-
-  <div class="player-container">
+  <div class="player-phone-container">
     
-    <!-- BRANDING HEADER -->
-    <header class="player-header-exact">
-      <div class="brand">
-        <span class="brand-icon">⚡</span>
-        <span class="brand-title">Kahoot Live Player</span>
+    <!-- BRANDING HEADER (MATCHING MOCKUP TOP) -->
+    <header class="player-header-mockup">
+      <div class="brand-title-group">
+        <div class="brand-main">
+          <span class="lightning-icon">⚡</span>
+          <span class="kahoot-word">Kahoot</span>
+          <span class="live-player-word">Live Player</span>
+        </div>
+        <div class="mockup-tagline">
+          « PLAY &bull; LEARN &bull; BUILD A BETTER TOMORROW »
+        </div>
       </div>
     </header>
 
-    <!-- 1️⃣ JOIN STAGE (MATCHING EXACT TARGET MOCKUP) -->
-    <div id="playerJoinStage" class="player-card join-card-exact">
-      <div class="join-header-exact">
-        <div class="header-left">
-          <div class="controller-icon-badge">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2">
-              <rect x="2" y="6" width="20" height="12" rx="6" fill="#6366f1"/>
-              <path d="M6 12h4M8 10v4" stroke="#fff" stroke-width="2"/>
-              <circle cx="15" cy="10" r="1" fill="#fff"/>
-              <circle cx="17" cy="12" r="1" fill="#fff"/>
-            </svg>
-          </div>
-          <div class="header-title-block">
-            <h2>Join <span class="highlight-blue">Live Quiz</span></h2>
-            <div class="title-underline"></div>
-            <p class="subtitle-text">Enter the game details to join the quiz on the big screen.</p>
-          </div>
+    <!-- 1️⃣ JOIN STAGE (MATCHING MOCKUP 1:1) -->
+    <div id="playerJoinStage" class="player-card join-card-mockup">
+      <div class="join-header-mockup">
+        <div class="header-title-left">
+          <h2>Join <span class="cyan-highlight">Live Quiz</span></h2>
+          <p class="join-subtitle">Enter the game details to join the quiz on the big screen.</p>
         </div>
-        <div class="lets-play-badge">
-          <span>Let's Play!</span>
+        <div class="controller-badge-mockup">
+          <i class="fa-solid fa-gamepad"></i>
         </div>
       </div>
       
-      <div class="exact-form-container">
+      <div class="mockup-form-container">
         <!-- Game PIN Row -->
-        <div class="exact-input-group">
-          <div class="square-badge badge-pink">#</div>
-          <div class="input-field-wrapper">
-            <label for="playerPinInput" class="exact-label">Game PIN</label>
-            <input type="number" id="playerPinInput" class="exact-input-box" placeholder="e.g. 4829" pattern="[0-9]*" inputmode="numeric" required>
+        <div class="mockup-input-row">
+          <div class="badge-square badge-pink">#</div>
+          <div class="input-content-wrapper">
+            <label for="playerPinInput" class="mockup-label">Game PIN</label>
+            <input type="number" id="playerPinInput" class="mockup-input-box" placeholder="e.g. 4829" pattern="[0-9]*" inputmode="numeric" required>
           </div>
         </div>
 
         <!-- Your Name / Nickname Row -->
-        <div class="exact-input-group">
-          <div class="square-badge badge-cyan"><i class="fa-solid fa-user"></i></div>
-          <div class="input-field-wrapper">
-            <label for="playerNameInput" class="exact-label">Your Name / Nickname</label>
-            <input type="text" id="playerNameInput" class="exact-input-box" placeholder="e.g. Manoj" required maxlength="20">
+        <div class="mockup-input-row">
+          <div class="badge-square badge-blue"><i class="fa-solid fa-user"></i></div>
+          <div class="input-content-wrapper">
+            <label for="playerNameInput" class="mockup-label">Your Name / Nickname</label>
+            <input type="text" id="playerNameInput" class="mockup-input-box" placeholder="e.g. Manoj" required maxlength="20">
           </div>
         </div>
 
         <!-- Roll Number Row -->
-        <div class="exact-input-group">
-          <div class="square-badge badge-emerald"><i class="fa-solid fa-graduation-cap"></i></div>
-          <div class="input-field-wrapper">
-            <label for="playerRollInput" class="exact-label">Roll Number (Optional)</label>
-            <input type="text" id="playerRollInput" class="exact-input-box" placeholder="e.g. 21CS01">
+        <div class="mockup-input-row">
+          <div class="badge-square badge-green"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="input-content-wrapper">
+            <label for="playerRollInput" class="mockup-label">Roll Number (Optional)</label>
+            <input type="text" id="playerRollInput" class="mockup-input-box" placeholder="e.g. 21CS01">
           </div>
+        </div>
+
+        <!-- Free Fire Character Profile Picker -->
+        <div class="char-picker-section">
+          <label class="mockup-label yellow-text"><i class="fa-solid fa-fire"></i> Choose Your Free Fire Character Profile:</label>
+          <div id="characterPicker" class="ff-char-grid"></div>
+          <input type="hidden" id="selectedCharInput" value="alok">
         </div>
       </div>
 
-      <div class="exact-action-bar">
-        <button class="btn-exact-enter" onclick="PlayerApp.joinGame()">
-          Enter Game ➔
+      <div class="mockup-action-row">
+        <button class="btn-lets-play" onclick="PlayerApp.joinGame()">
+          <span class="play-arrow">▶</span> Let's Play! <span class="btn-slanted-stripes"></span>
         </button>
       </div>
     </div>
 
     <!-- 2️⃣ LOBBY STAGE -->
-    <div id="playerLobbyStage" class="player-card modern-card-stage" style="display: none;">
+    <div id="playerLobbyStage" class="player-card glass-stage-card" style="display: none;">
       <div class="connected-badge">
         <span class="pulse-dot"></span> CONNECTED
       </div>
+      <div id="playerAvatarDisplay" class="player-avatar-lobby"></div>
       <h2 id="connectedName">Player Name</h2>
-      <p>You're in! Look at the <strong>Big Screen</strong> to see your name.</p>
+      <p id="connectedCharName" class="cyan-text font-bold"></p>
+      <p class="lobby-instruction">You're in! Look at the <strong>Big Screen</strong> to see your character.</p>
       <div class="waiting-animation">
         <div class="dot-bounce"></div>
         <div class="dot-bounce"></div>
@@ -133,36 +107,43 @@
 
       <div id="playerOptionsContainer" class="player-options-grid"></div>
 
-      <div id="playerAnsweredLock" class="player-card modern-card-stage" style="display: none;">
+      <div id="playerAnsweredLock" class="player-card glass-stage-card" style="display: none;">
         <div class="lock-icon">🔒</div>
         <h3>Answer Submitted!</h3>
         <p>Waiting for time to expire on the big screen...</p>
       </div>
     </div>
 
-    <!-- 4️⃣ RESULT FEEDBACK STAGE -->
+    <!-- 4️⃣ RESULT FEEDBACK STAGE (MATCHING EXACT 1:1 MOCKUP) -->
     <div id="playerResultStage" style="display: none;">
-      <div id="playerFeedbackBox" class="feedback-card"></div>
-      <div class="score-summary-card">
-        <span>Total Score:</span>
-        <strong id="playerTotalScore">0</strong> pts
-      </div>
+      <div id="playerFeedbackBox" class="result-mockup-card"></div>
     </div>
 
     <!-- 5️⃣ LEADERBOARD WAITING STAGE -->
-    <div id="playerLeaderboardStage" class="player-card modern-card-stage" style="display: none;">
+    <div id="playerLeaderboardStage" class="player-card glass-stage-card" style="display: none;">
       <h2>📊 Check Big Screen!</h2>
       <p>Leaderboard and rankings are currently showing on the host display.</p>
     </div>
 
     <!-- 6️⃣ GAME OVER STAGE -->
-    <div id="playerGameOverStage" class="player-card modern-card-stage" style="display: none;">
+    <div id="playerGameOverStage" class="player-card glass-stage-card" style="display: none;">
       <div class="trophy-icon">🏆</div>
-      <h2>Quiz Completed!</h2>
-      <div id="finalRankDisplay" class="final-rank">Rank #1</div>
-      <div id="finalScoreDisplay" class="final-score">1000 pts</div>
-      <button class="btn-exact-enter btn-block margin-top" onclick="window.location.reload()">
-        Play Again 🔄
+      <h2 class="yellow-text">Quiz Completed!</h2>
+
+      <div class="wait-rank-banner margin-top-sm margin-bottom-sm">
+        <i class="fa-solid fa-hourglass-half pulse-glow icon-cyan"></i>
+        <span class="wait-rank-text">WAIT FOR RANK ON BIG SCREEN 📺</span>
+      </div>
+
+      <div class="player-final-stats-box">
+        <div id="finalRankDisplay" class="final-rank">Rank #1</div>
+        <div id="finalScoreDisplay" class="final-score">4000 pts (4 correct)</div>
+      </div>
+
+      <p class="subtitle-gaming margin-top-sm">Look at the Host Screen for 1st, 2nd & 3rd Place Winners Podium!</p>
+
+      <button class="btn-lets-play btn-block margin-top" onclick="window.location.href='index.html'">
+        <i class="fa-solid fa-house"></i> Back to Home Page 🏠
       </button>
     </div>
 
@@ -175,7 +156,7 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');
     }
   </script>
-  <script src="live-quiz.js"></script>
+  <script src="live-quiz.js?v=31"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof PlayerApp !== 'undefined') {
