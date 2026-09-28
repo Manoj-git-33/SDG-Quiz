@@ -1,4 +1,399 @@
 {
+    "SDG": {
+        "name": "SDG Quiz (30 Questions)",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "What does SDG stand for?",
+                "options": [
+                    "Sustainable Development Goals",
+                    "Systematic Development Goals",
+                    "Social Development Goals",
+                    "Standard Development Goals"
+                ],
+                "correctAnswer": 0,
+                "explanation": "SDG stands for Sustainable Development Goals, a set of 17 global goals adopted by the UN in 2015."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "How many Sustainable Development Goals are there?",
+                "options": [
+                    "15",
+                    "17",
+                    "20",
+                    "10"
+                ],
+                "correctAnswer": 1,
+                "explanation": "There are 17 Sustainable Development Goals established by the United Nations."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which organization adopted the SDGs?",
+                "options": [
+                    "World Health Organization (WHO)",
+                    "World Bank",
+                    "United Nations (UN)",
+                    "International Monetary Fund (IMF)"
+                ],
+                "correctAnswer": 2,
+                "explanation": "The United Nations (UN) adopted the Sustainable Development Goals in 2015."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which SDG focuses on ending poverty?",
+                "options": [
+                    "SDG 1",
+                    "SDG 2",
+                    "SDG 3",
+                    "SDG 4"
+                ],
+                "correctAnswer": 0,
+                "explanation": "SDG 1 aims to End poverty in all its forms everywhere."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "What is SDG 2 mainly about?",
+                "options": [
+                    "Good Health and Well-being",
+                    "Zero Hunger",
+                    "Clean Water and Sanitation",
+                    "Quality Education"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 2 focuses on Zero Hunger — ending hunger, achieving food security, and improving nutrition."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which SDG focuses on Good Health and Well-being?",
+                "options": [
+                    "SDG 2",
+                    "SDG 3",
+                    "SDG 5",
+                    "SDG 6"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 3 focuses on Good Health and Well-being for all at all ages."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which SDG focuses on Quality Education?",
+                "options": [
+                    "SDG 3",
+                    "SDG 4",
+                    "SDG 5",
+                    "SDG 8"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 4 aims to ensure inclusive and equitable quality education."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which SDG is about Gender Equality?",
+                "options": [
+                    "SDG 4",
+                    "SDG 5",
+                    "SDG 6",
+                    "SDG 10"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 5 focuses on achieving gender equality and empowering all women and girls."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which SDG focuses on Clean Water and Sanitation?",
+                "options": [
+                    "SDG 5",
+                    "SDG 6",
+                    "SDG 7",
+                    "SDG 14"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 6 aims to ensure availability and sustainable management of water and sanitation for all."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "easy",
+                "question": "Which SDG focuses on Climate Action?",
+                "options": [
+                    "SDG 11",
+                    "SDG 12",
+                    "SDG 13",
+                    "SDG 15"
+                ],
+                "correctAnswer": 2,
+                "explanation": "SDG 13 urges urgent action to combat climate change and its impacts."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "In which year were the Sustainable Development Goals officially adopted?",
+                "options": [
+                    "2010",
+                    "2015",
+                    "2018",
+                    "2020"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The SDGs were officially adopted by 193 UN member states in September 2015."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "The SDGs are intended to be achieved by which year?",
+                "options": [
+                    "2025",
+                    "2030",
+                    "2040",
+                    "2050"
+                ],
+                "correctAnswer": 1,
+                "explanation": "The SDGs are part of the 2030 Agenda for Sustainable Development, targeted for 2030."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which SDG focuses on Affordable and Clean Energy?",
+                "options": [
+                    "SDG 6",
+                    "SDG 7",
+                    "SDG 9",
+                    "SDG 11"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 7 aims to ensure access to affordable, reliable, sustainable, and modern energy for all."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which SDG focuses on Decent Work and Economic Growth?",
+                "options": [
+                    "SDG 7",
+                    "SDG 8",
+                    "SDG 9",
+                    "SDG 10"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 8 promotes sustained, inclusive economic growth and decent work for all."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "What is the main focus of SDG 9?",
+                "options": [
+                    "Sustainable Cities",
+                    "Industry, Innovation, and Infrastructure",
+                    "Responsible Consumption",
+                    "Life on Land"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 9 focuses on Industry, Innovation, and Infrastructure."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which SDG aims to reduce inequality within and among countries?",
+                "options": [
+                    "SDG 5",
+                    "SDG 8",
+                    "SDG 10",
+                    "SDG 16"
+                ],
+                "correctAnswer": 2,
+                "explanation": "SDG 10 targets reducing inequality within and among countries."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which SDG focuses on Sustainable Cities and Communities?",
+                "options": [
+                    "SDG 10",
+                    "SDG 11",
+                    "SDG 12",
+                    "SDG 13"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 11 aims to make cities and human settlements inclusive, safe, resilient, and sustainable."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Responsible Consumption and Production is which SDG?",
+                "options": [
+                    "SDG 10",
+                    "SDG 11",
+                    "SDG 12",
+                    "SDG 13"
+                ],
+                "correctAnswer": 2,
+                "explanation": "SDG 12 focuses on ensuring sustainable consumption and production patterns."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which SDG focuses on Life Below Water?",
+                "options": [
+                    "SDG 13",
+                    "SDG 14",
+                    "SDG 15",
+                    "SDG 16"
+                ],
+                "correctAnswer": 1,
+                "explanation": "SDG 14 focuses on conserving and sustainably using the oceans, seas, and marine resources."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "question": "Which SDG focuses on Life on Land?",
+                "options": [
+                    "SDG 13",
+                    "SDG 14",
+                    "SDG 15",
+                    "SDG 16"
+                ],
+                "correctAnswer": 2,
+                "explanation": "SDG 15 aims to protect, restore, and promote sustainable use of terrestrial ecosystems."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG specifically includes the target of substantially reducing the proportion of people living below the poverty line?",
+                "options": [
+                    "SDG 1",
+                    "SDG 2",
+                    "SDG 8",
+                    "SDG 10"
+                ],
+                "correctAnswer": 0,
+                "explanation": "Target 1.2 of SDG 1 aims to reduce at least by half the proportion of men, women and children living in poverty."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG includes the target of achieving universal and equitable access to safe and affordable drinking water?",
+                "options": [
+                    "SDG 3",
+                    "SDG 5",
+                    "SDG 6",
+                    "SDG 14"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Target 6.1 of SDG 6 aims to achieve universal and equitable access to safe and affordable drinking water by 2030."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG includes targets related to sustainable infrastructure and upgrading industries to make them sustainable?",
+                "options": [
+                    "SDG 7",
+                    "SDG 8",
+                    "SDG 9",
+                    "SDG 11"
+                ],
+                "correctAnswer": 2,
+                "explanation": "SDG 9 includes targets for developing sustainable, resilient infrastructure and upgrading industries."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG includes the target of significantly reducing marine pollution of all kinds?",
+                "options": [
+                    "SDG 6",
+                    "SDG 13",
+                    "SDG 14",
+                    "SDG 15"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Target 14.1 of SDG 14 focuses on preventing and significantly reducing marine pollution of all kinds."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG includes combating desertification and restoring degraded land and soil?",
+                "options": [
+                    "SDG 12",
+                    "SDG 13",
+                    "SDG 14",
+                    "SDG 15"
+                ],
+                "correctAnswer": 3,
+                "explanation": "Target 15.3 of SDG 15 specifically calls for combating desertification and restoring degraded land."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG focuses on building effective, accountable and inclusive institutions at all levels?",
+                "options": [
+                    "SDG 10",
+                    "SDG 11",
+                    "SDG 16",
+                    "SDG 17"
+                ],
+                "correctAnswer": 2,
+                "explanation": "SDG 16 focuses on Peace, Justice, and Strong Institutions."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which SDG is primarily concerned with strengthening global partnerships for sustainable development?",
+                "options": [
+                    "SDG 14",
+                    "SDG 15",
+                    "SDG 16",
+                    "SDG 17"
+                ],
+                "correctAnswer": 3,
+                "explanation": "SDG 17 focuses on Partnerships for the Goals."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "Which of the following is an example of an SDG 12-related action?",
+                "options": [
+                    "Promoting fossil fuel subsidies",
+                    "Reducing food waste and recycling materials",
+                    "Increasing plastic production",
+                    "Deforestation"
+                ],
+                "correctAnswer": 1,
+                "explanation": "Reducing food waste and recycling materials promotes sustainable consumption and production (SDG 12)."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "A city invests in public transportation, affordable housing, green spaces and improved urban planning. Which SDG is most directly addressed?",
+                "options": [
+                    "SDG 8",
+                    "SDG 9",
+                    "SDG 11",
+                    "SDG 13"
+                ],
+                "correctAnswer": 2,
+                "explanation": "Sustainable urban transport, housing, and green spaces directly address SDG 11: Sustainable Cities and Communities."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "question": "A country improves renewable energy access, creates green jobs, protects ecosystems and strengthens international cooperation. Which statement best describes the SDGs?",
+                "options": [
+                    "The SDGs are completely isolated from each other.",
+                    "The SDGs are interconnected and work together for sustainable development.",
+                    "Only economic goals matter in SDGs.",
+                    "SDGs apply only to developing nations."
+                ],
+                "correctAnswer": 1,
+                "explanation": "The SDGs are interconnected and integrated; progress in one goal supports progress in others."
+            }
+        ]
+    },
     "JAVA23A": {
         "name": "Set A",
         "mcq": [
@@ -267,9 +662,27 @@
                 "inputDescription": "Two integers a and b",
                 "outputDescription": "Sum of a and b",
                 "testCases": [
-                    {"input": [5, 3], "output": 8},
-                    {"input": [-1, 1], "output": 0},
-                    {"input": [0, 0], "output": 0}
+                    {
+                        "input": [
+                            5,
+                            3
+                        ],
+                        "output": 8
+                    },
+                    {
+                        "input": [
+                            -1,
+                            1
+                        ],
+                        "output": 0
+                    },
+                    {
+                        "input": [
+                            0,
+                            0
+                        ],
+                        "output": 0
+                    }
                 ]
             },
             {
@@ -279,9 +692,24 @@
                 "inputDescription": "An integer num",
                 "outputDescription": "true if num is even, false otherwise",
                 "testCases": [
-                    {"input": [4], "output": true},
-                    {"input": [7], "output": false},
-                    {"input": [0], "output": true}
+                    {
+                        "input": [
+                            4
+                        ],
+                        "output": true
+                    },
+                    {
+                        "input": [
+                            7
+                        ],
+                        "output": false
+                    },
+                    {
+                        "input": [
+                            0
+                        ],
+                        "output": true
+                    }
                 ]
             },
             {
@@ -291,9 +719,24 @@
                 "inputDescription": "A string to reverse (e.g., 'hello')",
                 "outputDescription": "The reversed string (e.g., 'olleh')",
                 "testCases": [
-                    {"input": ["hello"], "output": "olleh"},
-                    {"input": ["world"], "output": "dlrow"},
-                    {"input": [""], "output": ""}
+                    {
+                        "input": [
+                            "hello"
+                        ],
+                        "output": "olleh"
+                    },
+                    {
+                        "input": [
+                            "world"
+                        ],
+                        "output": "dlrow"
+                    },
+                    {
+                        "input": [
+                            ""
+                        ],
+                        "output": ""
+                    }
                 ]
             },
             {
@@ -303,9 +746,24 @@
                 "inputDescription": "A non-negative integer n",
                 "outputDescription": "Factorial of n (n!)",
                 "testCases": [
-                    {"input": [5], "output": 120},
-                    {"input": [3], "output": 6},
-                    {"input": [0], "output": 1}
+                    {
+                        "input": [
+                            5
+                        ],
+                        "output": 120
+                    },
+                    {
+                        "input": [
+                            3
+                        ],
+                        "output": 6
+                    },
+                    {
+                        "input": [
+                            0
+                        ],
+                        "output": 1
+                    }
                 ]
             },
             {
@@ -315,9 +773,30 @@
                 "inputDescription": "Two numbers and an operation ('add', 'subtract', 'multiply', 'divide')",
                 "outputDescription": "Result of the operation or error message for division by zero",
                 "testCases": [
-                    {"input": [5, 3, "add"], "output": 8},
-                    {"input": [10, 2, "divide"], "output": 5},
-                    {"input": [7, 0, "divide"], "output": "Cannot divide by zero"}
+                    {
+                        "input": [
+                            5,
+                            3,
+                            "add"
+                        ],
+                        "output": 8
+                    },
+                    {
+                        "input": [
+                            10,
+                            2,
+                            "divide"
+                        ],
+                        "output": 5
+                    },
+                    {
+                        "input": [
+                            7,
+                            0,
+                            "divide"
+                        ],
+                        "output": "Cannot divide by zero"
+                    }
                 ]
             },
             {
@@ -327,9 +806,24 @@
                 "inputDescription": "A string to check",
                 "outputDescription": "true if the string is a palindrome, false otherwise",
                 "testCases": [
-                    {"input": ["madam"], "output": true},
-                    {"input": ["racecar"], "output": true},
-                    {"input": ["hello"], "output": false}
+                    {
+                        "input": [
+                            "madam"
+                        ],
+                        "output": true
+                    },
+                    {
+                        "input": [
+                            "racecar"
+                        ],
+                        "output": true
+                    },
+                    {
+                        "input": [
+                            "hello"
+                        ],
+                        "output": false
+                    }
                 ]
             }
         ]
@@ -502,9 +996,27 @@
                 "inputDescription": "Two integers a and b",
                 "outputDescription": "The larger of the two numbers",
                 "testCases": [
-                    {"input": [5, 3], "output": 5},
-                    {"input": [-1, 1], "output": 1},
-                    {"input": [0, 0], "output": 0}
+                    {
+                        "input": [
+                            5,
+                            3
+                        ],
+                        "output": 5
+                    },
+                    {
+                        "input": [
+                            -1,
+                            1
+                        ],
+                        "output": 1
+                    },
+                    {
+                        "input": [
+                            0,
+                            0
+                        ],
+                        "output": 0
+                    }
                 ]
             },
             {
@@ -514,9 +1026,24 @@
                 "inputDescription": "A non-negative integer n",
                 "outputDescription": "The nth Fibonacci number",
                 "testCases": [
-                    {"input": [0], "output": 0},
-                    {"input": [1], "output": 1},
-                    {"input": [6], "output": 8}
+                    {
+                        "input": [
+                            0
+                        ],
+                        "output": 0
+                    },
+                    {
+                        "input": [
+                            1
+                        ],
+                        "output": 1
+                    },
+                    {
+                        "input": [
+                            6
+                        ],
+                        "output": 8
+                    }
                 ]
             },
             {
@@ -526,9 +1053,38 @@
                 "inputDescription": "An integer limit",
                 "outputDescription": "List of prime numbers up to the limit",
                 "testCases": [
-                    {"input": [10], "output": [2, 3, 5, 7]},
-                    {"input": [20], "output": [2, 3, 5, 7, 11, 13, 17, 19]},
-                    {"input": [1], "output": []}
+                    {
+                        "input": [
+                            10
+                        ],
+                        "output": [
+                            2,
+                            3,
+                            5,
+                            7
+                        ]
+                    },
+                    {
+                        "input": [
+                            20
+                        ],
+                        "output": [
+                            2,
+                            3,
+                            5,
+                            7,
+                            11,
+                            13,
+                            17,
+                            19
+                        ]
+                    },
+                    {
+                        "input": [
+                            1
+                        ],
+                        "output": []
+                    }
                 ]
             }
         ]

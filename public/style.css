@@ -6677,10 +6677,15 @@ body.room-created-active,
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
   z-index: 99999 !important;
-  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 1.5rem !important;
+  display: none;
+}
+
+.dashboard-modal-backdrop.active,
+.dashboard-modal-backdrop[style*="display: flex"] {
+  display: flex !important;
 }
 
 .dashboard-modal-box {

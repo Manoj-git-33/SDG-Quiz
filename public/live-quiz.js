@@ -492,12 +492,14 @@ window.HostApp = {
     const modal = document.getElementById('hostDashboardModal');
     if (!modal) return;
     if (show) {
-      modal.style.display = 'flex';
+      modal.classList.add('active');
+      modal.style.setProperty('display', 'flex', 'important');
       this.updateDashboardModalData();
       if (this._dashboardTimer) clearInterval(this._dashboardTimer);
       this._dashboardTimer = setInterval(() => this.updateDashboardModalData(), 2000);
     } else {
-      modal.style.display = 'none';
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
       if (this._dashboardTimer) clearInterval(this._dashboardTimer);
     }
   },
@@ -515,10 +517,19 @@ window.HostApp = {
 
       let players = [];
 
-      // 1. Gather live connected players from active rooms
+      // 1. Gather current live room players from HostApp memory
+      if (Array.isArray(this.players) && this.players.length > 0) {
+        this.players.forEach(p => players.push(p));
+      }
+
+      // 2. Gather live connected players from active rooms API response
       activeRooms.forEach(r => {
         if (Array.isArray(r.players)) {
-          r.players.forEach(p => players.push(p));
+          r.players.forEach(p => {
+            if (!players.some(existing => (existing.id && existing.id === p.id) || (existing.name === p.name && existing.roll === p.roll))) {
+              players.push(p);
+            }
+          });
         }
       });
 

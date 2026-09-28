@@ -591,7 +591,7 @@ function getCharacterData(charId, index = 0) {
 
     let pointsEarned = 0;
     if (isCorrect) {
-      pointsEarned = 1000;
+      pointsEarned = 500;
       player.score += pointsEarned;
       player.totalCorrect += 1;
     }

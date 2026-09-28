@@ -49,7 +49,8 @@
             <span class="gaming-box-desc">Choose which set of questions to use</span>
             <div class="select-wrapper">
               <select id="setSelect" class="gaming-select">
-                <option value="JAVA23A" selected>Set A (Java OOP) (20 Questions)</option>
+                <option value="SDG" selected>Sustainable Development Goals (SDG) (30 Questions)</option>
+                <option value="JAVA23A">Set A (Java OOP) (20 Questions)</option>
                 <option value="JAVA23B">Set B (Java Advanced) (10 Questions)</option>
                 <option value="GKINDIA1">India General Knowledge Set 1 (3 Questions)</option>
               </select>
@@ -249,7 +250,7 @@
         </button>
       </div>
     <!-- 📊 LIVE IN-PAGE DASHBOARD OVERLAY MODAL -->
-    <div id="hostDashboardModal" class="dashboard-modal-backdrop" style="display: none;">
+    <div id="hostDashboardModal" class="dashboard-modal-backdrop" style="display: none;" onclick="if(event.target===this) HostApp.toggleDashboardModal(false)">
       <div class="dashboard-modal-box">
         <div class="dashboard-modal-header">
           <h3>📊 Live Student Leaderboard & Connected Dashboard</h3>
