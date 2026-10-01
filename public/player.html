@@ -6,7 +6,8 @@
   <title>Kahoot Live Player - Join Game</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=29">
+  <link rel="stylesheet" href="style.css?v=30">
+  <script src="config.js"></script>
 </head>
 <body class="player-body mobile-theme">
 
@@ -24,7 +25,26 @@
           « PLAY &bull; LEARN &bull; BUILD A BETTER TOMORROW »
         </div>
       </div>
+      <button id="playerSoundToggle" class="control-pill-gaming" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(0,229,255,0.3); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; cursor: pointer; white-space: nowrap;" onclick="PlayerApp.toggleSound()" title="Toggle Sound">
+        🔊 Sound On
+      </button>
     </header>
+
+    <!-- 🎮 PLAYER LIVE MULTIPLAYER HUD (VISIBLE ONCE JOINED) -->
+    <div id="playerLiveHud" class="player-live-hud" style="display: none;">
+      <div id="playerHudStatusPill" class="hud-item hud-connection">
+        <span class="pulse-dot"></span>
+        <span id="hudConnectionText" class="hud-label">CONNECTED</span>
+      </div>
+      <div class="hud-item hud-player-info">
+        <img id="hudPlayerAvatar" src="/avatars/alok.jpg" alt="Avatar" class="hud-avatar-thumb" onerror="this.src='/avatars/alok.jpg'">
+        <span id="hudPlayerName" class="hud-name">Player</span>
+      </div>
+      <div class="hud-item hud-score-box">
+        <span class="hud-score-label">SCORE</span>
+        <span id="hudPlayerScore" class="hud-score-val">0</span>
+      </div>
+    </div>
 
     <!-- 1️⃣ JOIN STAGE (MATCHING MOCKUP 1:1) -->
     <div id="playerJoinStage" class="player-card join-card-mockup">
@@ -100,18 +120,40 @@
 
     <!-- 3️⃣ ACTIVE QUESTION STAGE -->
     <div id="playerQuestionStage" style="display: none;">
-      <div class="player-q-bar">
-        <span id="playerQIndex">Question 1</span>
-        <span class="active-badge">TAP YOUR ANSWER</span>
+      
+      <!-- Top Question Bar & Authoritative Countdown Timer -->
+      <div class="player-question-header-hud">
+        <div class="player-q-counter-box">
+          <span class="q-counter-label">STAGE</span>
+          <span id="playerQIndex" class="q-counter-number">QUESTION 1</span>
+        </div>
+
+        <div class="player-timer-sync-badge">
+          <span class="timer-sync-label"><i class="fa-solid fa-stopwatch"></i> TIME</span>
+          <span id="playerTimerCountdown" class="timer-sync-val">20</span>
+        </div>
       </div>
 
+      <!-- Live Question Prompt Card -->
+      <div id="playerQuestionCard" class="player-question-card">
+        <div id="playerQuestionSdgTag" class="player-sdg-tag">⚡ SDG MULTIPLAYER LIVE</div>
+        <h3 id="playerQuestionText" class="player-question-prompt">Loading question...</h3>
+      </div>
+
+      <!-- Tap Option Buttons (Large Touch Targets >= 44px) -->
       <div id="playerOptionsContainer" class="player-options-grid"></div>
 
-      <div id="playerAnsweredLock" class="player-card glass-stage-card" style="display: none;">
-        <div class="lock-icon">🔒</div>
-        <h3>Answer Submitted!</h3>
-        <p>Waiting for time to expire on the big screen...</p>
+      <!-- Answer Submitted Lock Overlay -->
+      <div id="playerAnsweredLock" class="player-card glass-stage-card answer-locked-card" style="display: none;">
+        <div class="answer-locked-icon-pulse"><i class="fa-solid fa-circle-check"></i></div>
+        <h3 class="answer-locked-title">✓ ANSWER SUBMITTED</h3>
+        <div class="locked-choice-bubble">
+          <span class="locked-choice-sub">Your Choice:</span>
+          <strong id="playerLockedChoice" class="locked-choice-name">...</strong>
+        </div>
+        <p class="answer-locked-wait">Waiting for timer deadline to expire on the big screen...</p>
       </div>
+
     </div>
 
     <!-- 4️⃣ RESULT FEEDBACK STAGE (MATCHING EXACT 1:1 MOCKUP) -->
@@ -156,7 +198,8 @@
       document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');
     }
   </script>
-  <script src="live-quiz.js?v=31"></script>
+  <script src="audio-manager.js"></script>
+  <script src="live-quiz.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof PlayerApp !== 'undefined') {

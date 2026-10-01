@@ -1088,5 +1088,94 @@
                 ]
             }
         ]
+    },
+    "SDGVERSE": {
+        "name": "SDGVERSE: Global Sustainable Goals Championship",
+        "mcq": [
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "sdg": 6,
+                "question": "[SDG 6: Clean Water] What percentage of global wastewater is discharged into ecosystems without adequate treatment, according to UN-Water?",
+                "options": [
+                    "Over 80%",
+                    "Approximately 40%",
+                    "Around 25%",
+                    "Less than 10%"
+                ],
+                "correctAnswer": 0,
+                "explanation": "According to the UN World Water Development Report, over 80% of wastewater worldwide is released back into nature without adequate treatment, threatening aquatic ecosystems and human health."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "sdg": 7,
+                "question": "[SDG 7: Clean Energy] Which renewable energy sector has seen the steepest cost reduction curve per megawatt-hour globally since 2010?",
+                "options": [
+                    "Solar Photovoltaic (PV)",
+                    "Nuclear Fission",
+                    "Geothermal Reservoirs",
+                    "Tidal Wave Converters"
+                ],
+                "correctAnswer": 0,
+                "explanation": "According to IRENA, solar photovoltaic utility-scale electricity costs have plummeted by over 88% since 2010, making it the fastest-falling cost curve in modern energy history."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "sdg": 3,
+                "question": "[SDG 3: Good Health] According to the World Health Organization (WHO), what is the single largest environmental health risk factor globally?",
+                "options": [
+                    "Air Pollution (Ambient & Household)",
+                    "Thermal Heatwaves",
+                    "Marine Microplastics",
+                    "Acoustic Noise Pollution"
+                ],
+                "correctAnswer": 0,
+                "explanation": "WHO estimates that combined ambient and household air pollution causes approximately 7 million premature deaths annually, making it humanity's greatest environmental health threat."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "sdg": 4,
+                "question": "[SDG 4: Quality Education] Which SDG 4 target explicitly mandates education for sustainable development, global citizenship, and human rights?",
+                "options": [
+                    "Target 4.7",
+                    "Target 4.1",
+                    "Target 4.3",
+                    "Target 4.b"
+                ],
+                "correctAnswer": 0,
+                "explanation": "SDG Target 4.7 mandates that by 2030, all learners acquire knowledge and skills needed to promote sustainable development, gender equality, and global citizenship."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "medium",
+                "sdg": 11,
+                "question": "[SDG 11: Sustainable Cities] What is the core design objective of the urban planning paradigm known as the '15-Minute City'?",
+                "options": [
+                    "Residents access daily essentials within a 15-minute walk or bike ride",
+                    "Public rapid transit trains must arrive within 15-minute intervals",
+                    "All commercial skyscrapers must allocate 15% rooftop gardens",
+                    "Private vehicle speeds are electronically throttled to 15 km/h"
+                ],
+                "correctAnswer": 0,
+                "explanation": "The 15-Minute City model redesigns urban centers so work, food, healthcare, and leisure are accessible within a 15-minute walk or bicycle commute, drastically slashing vehicular emissions."
+            },
+            {
+                "type": "mcq",
+                "difficulty": "hard",
+                "sdg": 13,
+                "question": "[SDG 13: Climate Action] Under the Paris Climate Agreement, what temperature anomaly above pre-industrial averages do nations pursue as a critical threshold to avert irreversible climate tipping points?",
+                "options": [
+                    "Pursuing efforts to limit warming to 1.5°C",
+                    "Capping average global warming at 3.0°C",
+                    "Restricting atmospheric carbon to 600 ppm",
+                    "Maintaining current 2020 equilibrium temperature"
+                ],
+                "correctAnswer": 0,
+                "explanation": "The Paris Agreement legally commits parties to hold warming well below 2.0°C and specifically pursue efforts to limit the increase to 1.5°C to protect vulnerable ecosystems and low-lying island states."
+            }
+        ]
     }
 }

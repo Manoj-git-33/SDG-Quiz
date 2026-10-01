@@ -6,7 +6,8 @@
 let socket = null;
 try {
   if (typeof io !== 'undefined') {
-    socket = io({
+    const socketUrl = (typeof window.getQuizSocketUrl === 'function') ? window.getQuizSocketUrl() : undefined;
+    socket = io(socketUrl, {
       transports: ['websocket', 'polling'], // Auto-fallback to HTTP polling on weak 2G/3G/4G
       reconnection: true,
       reconnectionAttempts: 30,
@@ -115,79 +116,41 @@ const FF_CHARACTERS = [
   { id: 'xayne', name: 'Xayne', title: 'Extreme Encounter', avatar: '/avatars/xayne.jpg', color: '#f43f5e' }
 ];
 
-// Audio FX Generator (Synthesized AudioContext - zero external mp3 files needed)
+// Audio FX Generator (Integrated with centralized window.AudioManager)
 const SoundFX = {
-  ctx: null,
-  muted: false,
+  get muted() {
+    return window.AudioManager ? window.AudioManager.muted : false;
+  },
+  set muted(val) {
+    if (window.AudioManager) window.AudioManager.muted = val;
+  },
 
   init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) this.ctx = new AudioCtx();
-    }
+    if (window.AudioManager) window.AudioManager.setupAutoplayUnlock();
   },
 
-  playTone(freq, duration, type = 'sine') {
-    if (this.muted) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + duration);
-    } catch (e) {}
-  },
-
-  join() { this.playTone(587.33, 0.15); }, // D5
-  tick() { this.playTone(800, 0.05, 'square'); },
+  join() {},
+  tick() {},
   correct() {
-    this.playTone(523.25, 0.1); // C5
-    setTimeout(() => this.playTone(659.25, 0.1), 100); // E5
-    setTimeout(() => this.playTone(783.99, 0.2), 200); // G5
+    if (window.AudioManager) window.AudioManager.correctAnswer();
   },
   cracker() {
-    if (this.muted) return;
-    try {
-      this.init();
-      if (!this.ctx) return;
-      for (let i = 0; i < 6; i++) {
-        setTimeout(() => {
-          if (!this.ctx) return;
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(300 + Math.random() * 900, this.ctx.currentTime);
-          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start();
-          osc.stop(this.ctx.currentTime + 0.08);
-        }, i * 65);
-      }
-    } catch (e) {}
+    if (window.AudioManager) window.AudioManager.correctAnswer();
   },
   wrong() {
-    this.playTone(300, 0.15, 'sawtooth');
-    setTimeout(() => this.playTone(220, 0.3, 'sawtooth'), 150);
+    if (window.AudioManager) window.AudioManager.wrongAnswer();
   },
-  fastest() {
-    this.playTone(880, 0.1, 'triangle');
-    setTimeout(() => this.playTone(1174.66, 0.3, 'triangle'), 120);
+  fastest() {},
+  victory() {},
+  gameStart() {
+    if (window.AudioManager) window.AudioManager.hostStartGame();
   },
-  victory() {
-    const notes = [523.25, 659.25, 783.99, 1046.50];
-    notes.forEach((n, i) => {
-      setTimeout(() => this.playTone(n, 0.25, 'triangle'), i * 150);
-    });
-  }
+  timeUp() {
+    if (window.AudioManager) window.AudioManager.timeUp();
+  },
+  answerLocked() {},
+  leaderboard() {},
+  createRoom() {}
 };
 
 // 🎉 FIRECRACKERS & FALLING PAPER CELEBRATION ANIMATION FOR CORRECT ANSWERS
@@ -215,8 +178,6 @@ function triggerCorrectCelebration(customCanvasId = 'confettiCanvas') {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
-
-  SoundFX.cracker();
 
   const particles = [];
   const colors = ['#ffe600', '#00ff66', '#00d2ff', '#ff1a40', '#ff007f', '#a855f7', '#ffffff', '#ffaa00'];
@@ -366,6 +327,9 @@ window.HostApp = {
   init() {
     this.loadQuestionSets();
     this.bindSocketEvents();
+    if (window.AudioManager) {
+      window.AudioManager.startLobbyMusic();
+    }
   },
 
   async loadQuestionSets() {
@@ -424,6 +388,11 @@ window.HostApp = {
 
   createGame() {
     SoundFX.init();
+    if (window.AudioManager) {
+      window.AudioManager.setupAutoplayUnlock();
+      window.AudioManager.startLobbyMusic();
+    }
+
     if (!socket && typeof io !== 'undefined') {
       try { socket = io(); } catch (e) {}
     }
@@ -449,11 +418,17 @@ window.HostApp = {
 
   startGame() {
     if (!this.pin || !socket) return;
+    if (window.AudioManager) {
+      window.AudioManager.hostStartGame();
+    }
     socket.emit('host-start-game', { pin: this.pin });
   },
 
   skipTimer() {
     if (!this.pin || !socket) return;
+    if (window.AudioManager) {
+      window.AudioManager.timeUp();
+    }
     socket.emit('host-skip-timer', { pin: this.pin });
   },
 
@@ -475,9 +450,25 @@ window.HostApp = {
   },
 
   toggleSound() {
-    SoundFX.muted = !SoundFX.muted;
+    let isMuted;
+    if (window.AudioManager) {
+      if (!window.AudioManager.isBgmPlaying && !window.AudioManager.muted) {
+        window.AudioManager.startLobbyMusic();
+        const btn = document.getElementById('soundToggleBtn');
+        if (btn) btn.innerHTML = '🔊 Sound On';
+        const lobbyLabel = document.getElementById('lobbyMusicLabel');
+        if (lobbyLabel) lobbyLabel.innerHTML = 'Active 🔊';
+        return;
+      }
+      isMuted = window.AudioManager.toggleMute();
+    } else {
+      SoundFX.muted = !SoundFX.muted;
+      isMuted = SoundFX.muted;
+    }
     const btn = document.getElementById('soundToggleBtn');
-    if (btn) btn.innerHTML = SoundFX.muted ? '🔇 Sound Off' : '🔊 Sound On';
+    if (btn) btn.innerHTML = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+    const lobbyLabel = document.getElementById('lobbyMusicLabel');
+    if (lobbyLabel) lobbyLabel.innerHTML = isMuted ? 'Muted 🔇' : 'Active 🔊';
   },
 
   toggleFullscreen() {
@@ -609,6 +600,9 @@ window.HostApp = {
       if (pinDisplay) pinDisplay.textContent = data.pin;
 
       showHostStage('hostLobbyStage');
+      if (window.AudioManager) {
+        window.AudioManager.startLobbyMusic();
+      }
     });
 
     socket.off('error-msg');
@@ -617,7 +611,6 @@ window.HostApp = {
     });
 
     socket.on('player-list-update', (data) => {
-      SoundFX.join();
       const listEl = document.getElementById('playerList');
       const countEl = document.getElementById('playerCount');
       if (countEl) countEl.textContent = data.count;
@@ -648,6 +641,9 @@ window.HostApp = {
     });
 
     socket.on('new-question', (data) => {
+      if (window.AudioManager) {
+        window.AudioManager.startLobbyMusic();
+      }
       showHostStage('hostQuestionStage');
       this.currentQuestion = data;
       const qCurr = document.getElementById('qCurrNum');
@@ -697,8 +693,15 @@ window.HostApp = {
       if (timerEl) {
         timerEl.textContent = data.timeLeft;
         if (data.timeLeft <= 5 && data.timeLeft > 0) {
-          SoundFX.tick();
           timerEl.classList.add('pulse-red');
+          if (window.AudioManager) {
+            window.AudioManager.timeUp();
+          }
+        } else if (data.timeLeft <= 0) {
+          timerEl.classList.remove('pulse-red');
+          if (window.AudioManager) {
+            window.AudioManager.timeUp();
+          }
         } else {
           timerEl.classList.remove('pulse-red');
         }
@@ -712,6 +715,9 @@ window.HostApp = {
 
     socket.on('question-result', (data) => {
       showHostStage('hostResultStage');
+      if (window.AudioManager) {
+        window.AudioManager.stopBGM(0);
+      }
 
       const rawQText = data.questionText || '';
       const formattedQText = escapeHtml(rawQText).replace(/\b(not|never|except|false|incorrect)\b/gi, '<span class="yellow-highlight">$1</span>');
@@ -765,7 +771,6 @@ window.HostApp = {
       const fastestBox = document.getElementById('fastestPlayerBox');
       if (fastestBox) {
         if (data.fastestPlayer) {
-          SoundFX.fastest();
           fastestBox.style.display = 'flex';
           fastestBox.innerHTML = `
             <div class="fastest-bolt-icon">⚡</div>
@@ -812,7 +817,9 @@ window.HostApp = {
     });
 
     socket.on('game-over', (data) => {
-      SoundFX.victory();
+      if (window.AudioManager) {
+        window.AudioManager.playVictoryMusic();
+      }
       triggerConfetti();
 
       showHostStage('hostGameOverStage');
@@ -885,11 +892,100 @@ window.HostApp = {
 window.PlayerApp = {
   pin: null,
   name: null,
+  roll: null,
   selectedChar: 'alok',
+  questionEndTime: 0,
+  _timerInterval: null,
+  _currentOptions: [],
+  _playerEventsBound: false,
+
+  getPlayerId() {
+    let id = sessionStorage.getItem('sdg_quiz_player_id');
+    if (!id) {
+      id = 'p_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
+      sessionStorage.setItem('sdg_quiz_player_id', id);
+    }
+    return id;
+  },
 
   init() {
+    this.getPlayerId();
     this.renderCharacterPicker();
     this.bindSocketEvents();
+
+    // Check for existing session in sessionStorage to prefill or restore
+    const savedPin = sessionStorage.getItem('sdg_quiz_pin');
+    const savedName = sessionStorage.getItem('sdg_quiz_name');
+    const savedRoll = sessionStorage.getItem('sdg_quiz_roll');
+    const savedChar = sessionStorage.getItem('sdg_quiz_char');
+
+    if (savedPin) {
+      const pinInput = document.getElementById('playerPinInput');
+      if (pinInput) pinInput.value = savedPin;
+    }
+    if (savedName) {
+      const nameInput = document.getElementById('playerNameInput');
+      if (nameInput) nameInput.value = savedName;
+    }
+    if (savedRoll) {
+      const rollInput = document.getElementById('playerRollInput');
+      if (rollInput) rollInput.value = savedRoll;
+    }
+    if (savedChar) {
+      this.selectCharacter(savedChar);
+    }
+
+    if (window.AudioManager) {
+      window.AudioManager.startLobbyMusic();
+    }
+  },
+
+  updateHud(data = {}) {
+    const hud = document.getElementById('playerLiveHud');
+    if (hud) hud.style.display = 'flex';
+
+    if (data.name) {
+      const nameEl = document.getElementById('hudPlayerName');
+      if (nameEl) nameEl.textContent = data.name;
+    }
+    if (data.character && data.character.avatar) {
+      const avEl = document.getElementById('hudPlayerAvatar');
+      if (avEl) {
+        avEl.src = data.character.avatar;
+        avEl.onerror = () => { avEl.src = '/avatars/alok.jpg'; };
+      }
+    }
+    if (data.score !== undefined && data.score !== null) {
+      const scEl = document.getElementById('hudPlayerScore');
+      if (scEl) scEl.textContent = data.score;
+    }
+    if (data.connected !== undefined) {
+      const statusPill = document.getElementById('playerHudStatusPill');
+      const textEl = document.getElementById('hudConnectionText');
+      if (statusPill && textEl) {
+        if (data.connected) {
+          statusPill.className = 'hud-item hud-connection online';
+          textEl.textContent = 'CONNECTED';
+        } else {
+          statusPill.className = 'hud-item hud-connection reconnecting';
+          textEl.textContent = 'RECONNECTING...';
+        }
+      }
+    }
+  },
+
+  toggleSound() {
+    if (window.AudioManager) {
+      if (!window.AudioManager.isBgmPlaying && !window.AudioManager.muted) {
+        window.AudioManager.startLobbyMusic();
+        const btn = document.getElementById('playerSoundToggle');
+        if (btn) btn.innerHTML = '🔊 Sound On';
+        return;
+      }
+      const isMuted = window.AudioManager.toggleMute();
+      const btn = document.getElementById('playerSoundToggle');
+      if (btn) btn.innerHTML = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
+    }
   },
 
   renderCharacterPicker() {
@@ -935,12 +1031,13 @@ window.PlayerApp = {
     });
     const input = document.getElementById('selectedCharInput');
     if (input) input.value = charId;
+    sessionStorage.setItem('sdg_quiz_char', charId);
   },
 
   joinGame() {
     const pin = document.getElementById('playerPinInput')?.value.trim();
     const name = document.getElementById('playerNameInput')?.value.trim();
-    const roll = document.getElementById('playerRollInput')?.value.trim();
+    const roll = document.getElementById('playerRollInput')?.value.trim() || '';
     const charId = document.getElementById('selectedCharInput')?.value || this.selectedChar || 'alok';
 
     if (!pin || !name) {
@@ -948,72 +1045,170 @@ window.PlayerApp = {
     }
 
     SoundFX.init();
+    if (window.AudioManager) {
+      window.AudioManager.setupAutoplayUnlock();
+      window.AudioManager.playSFX(window.AudioManager.SOUNDS.GAME_START, 0.95, true);
+      window.AudioManager.startLobbyMusic();
+    }
+
     this.pin = pin;
     this.name = name;
+    this.roll = roll;
+
+    sessionStorage.setItem('sdg_quiz_pin', pin);
+    sessionStorage.setItem('sdg_quiz_name', name);
+    sessionStorage.setItem('sdg_quiz_roll', roll);
+    sessionStorage.setItem('sdg_quiz_char', charId);
 
     if (!socket && typeof io !== 'undefined') {
-      try { socket = io(); } catch (e) {}
+      const socketUrl = (typeof window.getQuizSocketUrl === 'function') ? window.getQuizSocketUrl() : undefined;
+      try {
+        socket = io(socketUrl, {
+          transports: ['websocket', 'polling'],
+          reconnection: true,
+          reconnectionAttempts: 30,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 3000,
+          timeout: 10000
+        });
+      } catch (e) {}
     }
     
     this.bindSocketEvents();
 
     if (socket) {
-      socket.emit('player-join-game', { pin, name, roll, characterId: charId });
+      socket.emit('player-join-game', {
+        pin: pin,
+        name: name,
+        roll: roll,
+        characterId: charId,
+        playerId: this.getPlayerId()
+      });
     }
   },
 
   submitAnswer(optionIndex) {
     if (!this.pin || !socket) return;
 
-    // Optimistic UI: Immediately lock buttons & show submitting status
+    // Instant Lockout: Disable all option buttons immediately to prevent duplicate submissions
     const btns = document.querySelectorAll('.player-opt-btn');
-    btns.forEach(b => b.disabled = true);
+    btns.forEach(b => {
+      b.disabled = true;
+      b.classList.add('disabled-btn');
+    });
 
     const selectedBtn = document.getElementById(`pOptBtn_${optionIndex}`);
-    if (selectedBtn) selectedBtn.classList.add('selected-btn');
+    if (selectedBtn) {
+      selectedBtn.classList.add('selected-btn');
+    }
+
+    // Display optimistic lock card with selected answer
+    const selText = this._currentOptions[optionIndex] || `Option ${optionIndex + 1}`;
+    const choiceEl = document.getElementById('playerLockedChoice');
+    if (choiceEl) choiceEl.textContent = selText;
+
+    const optContainer = document.getElementById('playerOptionsContainer');
+    if (optContainer) optContainer.style.display = 'none';
+
+    const lockBox = document.getElementById('playerAnsweredLock');
+    if (lockBox) lockBox.style.display = 'block';
 
     socket.emit('player-submit-answer', {
       pin: this.pin,
+      playerId: this.getPlayerId(),
       optionIndex: optionIndex
     });
   },
 
+  startSyncedTimer(durationSec, endTimeMs) {
+    if (this._timerInterval) {
+      clearInterval(this._timerInterval);
+      this._timerInterval = null;
+    }
+
+    this.questionEndTime = endTimeMs || (Date.now() + durationSec * 1000);
+
+    const tick = () => {
+      const remainingMs = this.questionEndTime - Date.now();
+      const secondsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
+      const countdownEl = document.getElementById('playerTimerCountdown');
+      const syncBadge = document.querySelector('.player-timer-sync-badge');
+
+      if (countdownEl) {
+        countdownEl.textContent = secondsLeft;
+      }
+
+      if (syncBadge) {
+        if (secondsLeft <= 5) {
+          syncBadge.classList.add('urgent-warning');
+        } else {
+          syncBadge.classList.remove('urgent-warning');
+        }
+      }
+
+      if (secondsLeft <= 0) {
+        clearInterval(this._timerInterval);
+        this._timerInterval = null;
+        // Lock answer buttons if user hasn't submitted yet
+        const btns = document.querySelectorAll('.player-opt-btn');
+        btns.forEach(b => {
+          b.disabled = true;
+          b.classList.add('disabled-btn');
+        });
+      }
+    };
+
+    tick();
+    this._timerInterval = setInterval(tick, 200);
+  },
+
   bindSocketEvents() {
     if (!socket && typeof io !== 'undefined') {
-      try { socket = io(); } catch (e) {}
+      const socketUrl = (typeof window.getQuizSocketUrl === 'function') ? window.getQuizSocketUrl() : undefined;
+      try {
+        socket = io(socketUrl, {
+          transports: ['websocket', 'polling'],
+          reconnection: true,
+          reconnectionAttempts: 30,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 3000,
+          timeout: 10000
+        });
+      } catch (e) {}
     }
     if (!socket || this._playerEventsBound) return;
     this._playerEventsBound = true;
 
-    // Low-network auto-reconnect logic
+    // Resilient Connection Handling
     socket.on('disconnect', (reason) => {
-      console.warn('Player disconnected from network:', reason);
-      const badge = document.querySelector('.connected-badge');
-      if (badge) {
-        badge.className = 'connected-badge disconnected-badge';
-        badge.innerHTML = '<span class="pulse-dot red-dot"></span> RECONNECTING...';
-      }
+      console.warn('Player disconnected from server:', reason);
+      this.updateHud({ connected: false });
     });
 
     socket.on('connect', () => {
-      console.log('Player connected to network!');
-      const badge = document.querySelector('.connected-badge');
-      if (badge) {
-        badge.className = 'connected-badge';
-        badge.innerHTML = '<span class="pulse-dot"></span> CONNECTED';
-      }
+      console.log('Player connected to server!');
+      this.updateHud({ connected: true });
+
+      // Auto-reconnect session if player was already in an active room
       if (this.pin && this.name) {
         const charId = document.getElementById('selectedCharInput')?.value || this.selectedChar || 'alok';
-        socket.emit('player-join-game', { pin: this.pin, name: this.name, characterId: charId });
+        socket.emit('player-join-game', {
+          pin: this.pin,
+          name: this.name,
+          roll: this.roll || '',
+          characterId: charId,
+          playerId: this.getPlayerId()
+        });
       }
     });
 
     socket.on('join-error', (data) => {
-      alert(data.message);
+      alert(data.message || 'Unable to join game. Check PIN and try again.');
     });
 
     socket.on('kicked-from-game', (data) => {
-      alert(data.message);
+      alert(data.message || 'You were removed from the lobby by the host.');
+      sessionStorage.removeItem('sdg_quiz_pin');
       window.location.reload();
     });
 
@@ -1021,9 +1216,14 @@ window.PlayerApp = {
       document.body.classList.add('room-created-active');
       const phoneCont = document.querySelector('.player-phone-container');
       if (phoneCont) phoneCont.classList.add('room-created-active');
+
       document.getElementById('playerJoinStage').style.display = 'none';
       document.getElementById('playerLobbyStage').style.display = 'block';
       document.getElementById('connectedName').textContent = data.name;
+
+      if (window.AudioManager) {
+        window.AudioManager.startLobbyMusic();
+      }
 
       const char = data.character || { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff', title: 'Drop The Beat' };
       const charDisplay = document.getElementById('playerAvatarDisplay');
@@ -1037,57 +1237,151 @@ window.PlayerApp = {
       }
       const charNameEl = document.getElementById('connectedCharName');
       if (charNameEl) charNameEl.textContent = `Free Fire Profile: ${char.name} (${char.title || ''})`;
+
+      // Update Top HUD
+      this.updateHud({
+        name: data.name,
+        character: char,
+        score: data.score || 0,
+        connected: true
+      });
     });
 
+    // Authoritative Immediately-Delivered Question Event (No Artificial Delay)
     socket.on('question-started', (data) => {
+      if (window.AudioManager) {
+        window.AudioManager.startLobbyMusic();
+      }
+
       document.getElementById('playerLobbyStage').style.display = 'none';
       document.getElementById('playerResultStage').style.display = 'none';
       document.getElementById('playerLeaderboardStage').style.display = 'none';
       document.getElementById('playerQuestionStage').style.display = 'block';
 
-      document.getElementById('playerQIndex').textContent = `Question ${data.questionIndex + 1}`;
-      document.getElementById('playerAnsweredLock').style.display = 'none';
+      // Update question header HUD
+      const qIndexEl = document.getElementById('playerQIndex');
+      if (qIndexEl) {
+        const qNum = (data.questionIndex !== undefined) ? (data.questionIndex + 1) : 1;
+        const total = data.totalQuestions || '';
+        qIndexEl.textContent = total ? `QUESTION ${qNum} / ${total}` : `QUESTION ${qNum}`;
+      }
 
-      const buttonsContainer = document.getElementById('playerOptionsContainer');
-      buttonsContainer.style.display = 'grid';
+      // Update question prompt text and SDG tag
+      const qPromptEl = document.getElementById('playerQuestionText');
+      if (qPromptEl) {
+        qPromptEl.textContent = data.questionText || `Question ${(data.questionIndex || 0) + 1}`;
+      }
+      const sdgTagEl = document.getElementById('playerQuestionSdgTag');
+      if (sdgTagEl) {
+        sdgTagEl.textContent = data.sdg ? `⚡ SDG: ${data.sdg}` : '⚡ SDG MULTIPLAYER LIVE';
+      }
 
+      // Cache options
       const options = (data.options && Array.isArray(data.options) && data.options.length > 0)
         ? data.options
         : ['True', 'False'];
+      this._currentOptions = options;
 
-      buttonsContainer.innerHTML = options.map((optText, idx) => {
-        const theme = OPTION_THEMES[idx] || OPTION_THEMES[0];
-        return `
-          <button id="pOptBtn_${idx}" class="mockup-card-outer card-theme-${idx} player-opt-btn" style="--card-grad: ${theme.gradient}; --card-glow: ${theme.glow}" onclick="PlayerApp.submitAnswer(${idx})">
-            <div class="mockup-card-inner">
-              ${theme.iconSvg}
-              <span class="mockup-card-text">${escapeHtml(optText)}</span>
-              <div class="mockup-corner-stripes">
-                <span></span><span></span><span></span><span></span>
+      const buttonsContainer = document.getElementById('playerOptionsContainer');
+      const lockBox = document.getElementById('playerAnsweredLock');
+
+      if (data.hasAnswered) {
+        // If reconnecting and already answered
+        buttonsContainer.style.display = 'none';
+        lockBox.style.display = 'block';
+      } else {
+        lockBox.style.display = 'none';
+        buttonsContainer.style.display = 'grid';
+
+        // Render option buttons with Free Fire themes and large touch targets (min 44px)
+        buttonsContainer.innerHTML = options.map((optText, idx) => {
+          const theme = OPTION_THEMES[idx] || OPTION_THEMES[0];
+          return `
+            <button id="pOptBtn_${idx}" class="mockup-card-outer card-theme-${idx} player-opt-btn" style="--card-grad: ${theme.gradient}; --card-glow: ${theme.glow}" onclick="PlayerApp.submitAnswer(${idx})">
+              <div class="mockup-card-inner">
+                ${theme.iconSvg}
+                <span class="mockup-card-text">${escapeHtml(optText)}</span>
+                <div class="mockup-corner-stripes">
+                  <span></span><span></span><span></span><span></span>
+                </div>
               </div>
-            </div>
-          </button>
-        `;
-      }).join('');
+            </button>
+          `;
+        }).join('');
+      }
+
+      // Synchronize with server authoritative countdown deadline
+      const durationSec = data.timeLimit || 20;
+      const endTimeMs = data.questionEndTime || (Date.now() + durationSec * 1000);
+      this.startSyncedTimer(durationSec, endTimeMs);
     });
 
-    socket.on('answer-accepted', () => {
-      document.getElementById('playerOptionsContainer').style.display = 'none';
-      document.getElementById('playerAnsweredLock').style.display = 'block';
+    socket.on('timer-tick', (data) => {
+      if (data.questionEndTime) {
+        this.questionEndTime = data.questionEndTime;
+      }
+      if (data.timeLeft <= 5) {
+        if (window.AudioManager) {
+          window.AudioManager.timeUp();
+        }
+      }
     });
 
+    socket.on('answer-accepted', (data) => {
+      const optContainer = document.getElementById('playerOptionsContainer');
+      if (optContainer) optContainer.style.display = 'none';
+
+      const lockBox = document.getElementById('playerAnsweredLock');
+      if (lockBox) lockBox.style.display = 'block';
+
+      if (data && data.selectedAnswerText) {
+        const choiceEl = document.getElementById('playerLockedChoice');
+        if (choiceEl) choiceEl.textContent = data.selectedAnswerText;
+      }
+      if (data && data.totalScore !== undefined) {
+        this.updateHud({ score: data.totalScore });
+      }
+    });
+
+    socket.on('answer-rejected', (data) => {
+      const optContainer = document.getElementById('playerOptionsContainer');
+      if (optContainer) {
+        const btns = optContainer.querySelectorAll('.player-opt-btn');
+        btns.forEach(b => { b.disabled = true; b.classList.add('disabled-btn'); });
+      }
+      console.warn('Answer rejected by server:', data);
+    });
+
+    // 🎯 3-STATE AUTHORITATIVE RESULT HANDLER (CORRECT / WRONG / TIMEOUT)
     socket.on('question-result', (data) => {
+      if (this._timerInterval) {
+        clearInterval(this._timerInterval);
+        this._timerInterval = null;
+      }
+
+      if (window.AudioManager) {
+        window.AudioManager.stopBGM(0);
+      }
+
       document.getElementById('playerQuestionStage').style.display = 'none';
       document.getElementById('playerResultStage').style.display = 'block';
 
       const statusBox = document.getElementById('playerFeedbackBox');
-      const isCorrect = data.isCorrect;
+      const resultType = data.resultType || (data.isCorrect ? 'CORRECT' : (data.timedOut ? 'TIMEOUT' : 'WRONG'));
       const timeSec = (data.timeTakenSec !== undefined && data.timeTakenSec !== null) ? data.timeTakenSec : '0.00';
       const points = data.pointsEarned || 0;
-      const totalScore = data.totalScore || 0;
+      const totalScore = (data.totalScore !== undefined && data.totalScore !== null) ? data.totalScore : 0;
+      const yourAnswer = data.selectedAnswerText || (data.selectedOptionIndex !== null && this._currentOptions[data.selectedOptionIndex]) || null;
+      const correctAnswer = data.correctAnswerText || 'See Host Big Screen';
 
-      if (isCorrect) {
-        SoundFX.correct();
+      // Update live HUD score
+      this.updateHud({ score: totalScore });
+
+      // STATE 1: CORRECT ANSWER
+      if (resultType === 'CORRECT') {
+        if (window.AudioManager) {
+          window.AudioManager.correctAnswer();
+        }
         triggerCorrectCelebration('playerConfettiCanvas');
         statusBox.className = 'result-mockup-card result-correct-theme';
         statusBox.innerHTML = `
@@ -1100,8 +1394,15 @@ window.PlayerApp = {
           <h1 class="result-title-correct">CORRECT!</h1>
           
           <div class="points-brush-banner">
-            <span class="points-text">+${points} pts</span>
+            <span class="points-text">+${points} POINTS</span>
           </div>
+
+          ${yourAnswer ? `
+            <div class="submitted-answer-preview correct-answer-tag">
+              <span class="preview-label">Your Answer:</span>
+              <strong class="preview-val">${escapeHtml(yourAnswer)}</strong>
+            </div>
+          ` : ''}
 
           <div class="result-stats-row">
             <div class="stat-pill-box pill-cyan">
@@ -1125,8 +1426,12 @@ window.PlayerApp = {
             </div>
           </div>
         `;
-      } else {
-        SoundFX.wrong();
+      } 
+      // STATE 2: WRONG ANSWER
+      else if (resultType === 'WRONG') {
+        if (window.AudioManager) {
+          window.AudioManager.wrongAnswer();
+        }
         statusBox.className = 'result-mockup-card result-wrong-theme';
         statusBox.innerHTML = `
           <div class="result-crown-emblem emblem-wrong">
@@ -1135,11 +1440,22 @@ window.PlayerApp = {
             </div>
           </div>
           
-          <h1 class="result-title-wrong">INCORRECT!</h1>
+          <h1 class="result-title-wrong">WRONG ANSWER</h1>
+
+          <div class="points-brush-banner zero-points-banner">
+            <span class="points-text">+0 POINTS</span>
+          </div>
           
+          ${yourAnswer ? `
+            <div class="submitted-answer-preview wrong-answer-tag">
+              <span class="preview-label">Your Answer:</span>
+              <strong class="preview-val">${escapeHtml(yourAnswer)}</strong>
+            </div>
+          ` : ''}
+
           <div class="correct-answer-banner">
-            <span class="correct-answer-label">Correct Answer:</span>
-            <strong class="correct-answer-val">${escapeHtml(data.correctAnswerText || 'See Big Screen')}</strong>
+            <span class="correct-answer-label"><i class="fa-solid fa-circle-check"></i> Correct Answer:</span>
+            <strong class="correct-answer-val">${escapeHtml(correctAnswer)}</strong>
           </div>
 
           <div class="result-stats-row margin-top-sm">
@@ -1164,6 +1480,57 @@ window.PlayerApp = {
             </div>
           </div>
         `;
+      } 
+      // STATE 3: TIME OUT
+      else {
+        if (window.AudioManager) {
+          window.AudioManager.timeUp();
+        }
+        statusBox.className = 'result-mockup-card result-timeout-theme';
+        statusBox.innerHTML = `
+          <div class="result-crown-emblem emblem-timeout">
+            <div class="emblem-center-circle-timeout">
+              <i class="fa-solid fa-hourglass-end"></i>
+            </div>
+          </div>
+          
+          <h1 class="result-title-timeout">TIME OUT</h1>
+
+          <div class="points-brush-banner timeout-points-banner">
+            <span class="points-text">+0 POINTS</span>
+          </div>
+
+          <div class="timeout-notice-banner">
+            <span class="timeout-notice-text">You did not submit an answer before the deadline.</span>
+          </div>
+
+          <div class="correct-answer-banner timeout-correct-box">
+            <span class="correct-answer-label"><i class="fa-solid fa-circle-check"></i> Correct Answer:</span>
+            <strong class="correct-answer-val">${escapeHtml(correctAnswer)}</strong>
+          </div>
+
+          <div class="result-stats-row margin-top-sm">
+            <div class="stat-pill-box pill-cyan">
+              <div class="stat-icon-wrapper cyan-icon-bg">
+                <i class="fa-solid fa-clock"></i>
+              </div>
+              <div class="stat-text-wrapper">
+                <div class="stat-label-sub">Status</div>
+                <div class="stat-value-cyan">Time Out</div>
+              </div>
+            </div>
+
+            <div class="stat-pill-box pill-gold">
+              <div class="stat-icon-wrapper gold-icon-bg">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div class="stat-text-wrapper">
+                <div class="stat-label-sub">Total Score</div>
+                <div class="stat-value-gold">${totalScore} pts</div>
+              </div>
+            </div>
+          </div>
+        `;
       }
     });
 
@@ -1173,13 +1540,18 @@ window.PlayerApp = {
     });
 
     socket.on('game-over', (data) => {
+      if (window.AudioManager) {
+        window.AudioManager.playVictoryMusic();
+      }
       document.getElementById('playerLeaderboardStage').style.display = 'none';
       document.getElementById('playerGameOverStage').style.display = 'block';
       
-      const myRankObj = data.allScores.find(p => p.name.toLowerCase() === (this.name || '').toLowerCase());
+      const myName = (this.name || '').toLowerCase();
+      const myRankObj = (data.allScores || []).find(p => p.name.toLowerCase() === myName);
       if (myRankObj) {
         document.getElementById('finalRankDisplay').textContent = `Rank #${myRankObj.rank}`;
         document.getElementById('finalScoreDisplay').textContent = `${myRankObj.score} pts (${myRankObj.totalCorrect} correct)`;
+        this.updateHud({ score: myRankObj.score });
       }
     });
   }

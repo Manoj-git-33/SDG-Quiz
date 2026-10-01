@@ -1,0 +1,34 @@
+# Netlify Production Deployment Configuration for SDG Quiz Frontend
+[build]
+  publish = "public"
+
+# Redirect root to host presenter view by default
+[[redirects]]
+  from = "/"
+  to = "/host.html"
+  status = 302
+  force = true
+
+# Ensure direct navigation to all html views works cleanly
+[[redirects]]
+  from = "/player"
+  to = "/player.html"
+  status = 200
+
+[[redirects]]
+  from = "/host"
+  to = "/host.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+# Security and caching headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Access-Control-Allow-Origin = "*"

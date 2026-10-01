@@ -10,21 +10,60 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 
-// Enable Socket.IO with permissive CORS for local network and online
+// Production and Local CORS Configuration
+const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || '';
+const configuredOrigins = allowedOriginsEnv
+  ? allowedOriginsEnv.split(',').map(o => o.trim()).filter(Boolean)
+  : [];
+
+function isOriginAllowed(origin) {
+  if (!origin) return true; // Mobile apps, curl, server-to-server
+  if (configuredOrigins.length === 0 || configuredOrigins.includes('*')) return true;
+  if (configuredOrigins.includes(origin)) return true;
+  // Always permit local development / Wi-Fi testing IP addresses
+  if (/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+    return true;
+  }
+  return false;
+}
+
+// Enable Socket.IO with production & local CORS support
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`[CORS Blocked] Origin not allowed: ${origin}`);
+        callback(new Error(`CORS origin not allowed: ${origin}`));
+      }
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const host = process.env.HOST || '0.0.0.0';
 const DATA_FILE = path.join(__dirname, process.env.DATA_FILE || 'results.json');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS origin not allowed: ${origin}`));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
+
+// Root directly opens Host Screen
+app.get('/', (req, res) => {
+  res.redirect('/host.html');
+});
 
 // Serve static files both at root / and /public/ route
 app.use(express.static(PUBLIC_DIR));
@@ -233,12 +272,24 @@ function startQuestionTimer(pin) {
   stopTimer(game);
   game.timeLeft = game.timePerQuestion || 20;
   game.questionStartTime = Date.now();
+  game.questionDuration = game.timeLeft * 1000;
+  game.questionEndTime = game.questionStartTime + game.questionDuration;
 
-  io.to(pin).emit('timer-tick', { timeLeft: game.timeLeft, totalTime: game.timePerQuestion });
+  io.to(pin).emit('timer-tick', {
+    timeLeft: game.timeLeft,
+    totalTime: game.timePerQuestion,
+    questionStartTime: game.questionStartTime,
+    questionEndTime: game.questionEndTime
+  });
 
   game.timerInterval = setInterval(() => {
     game.timeLeft -= 1;
-    io.to(pin).emit('timer-tick', { timeLeft: game.timeLeft, totalTime: game.timePerQuestion });
+    io.to(pin).emit('timer-tick', {
+      timeLeft: game.timeLeft,
+      totalTime: game.timePerQuestion,
+      questionStartTime: game.questionStartTime,
+      questionEndTime: game.questionEndTime
+    });
 
     if (game.timeLeft <= 0) {
       endQuestion(pin);
@@ -281,6 +332,7 @@ function endQuestion(pin) {
     questionText: currentQ.question,
     options: currentQ.options,
     correctAnswer: currentQ.correctAnswer,
+    correctAnswerText: currentQ.options[currentQ.correctAnswer],
     explanation: currentQ.explanation || '',
     optionCounts: optionCounts,
     answeredCount: answeredCount,
@@ -291,19 +343,56 @@ function endQuestion(pin) {
     } : null
   });
 
-  Object.keys(game.players).forEach(pSocketId => {
-    const player = game.players[pSocketId];
-    const ans = qAnswers[pSocketId];
+  // Authoritative Individual Results for Every Player (3 distinct states: CORRECT / WRONG / TIMEOUT)
+  Object.values(game.players).forEach(player => {
+    const ans = qAnswers[player.id];
+    let resultType = 'TIMEOUT';
+    let isCorrect = false;
+    let timedOut = true;
+    let pointsEarned = 0;
+    let selectedOptionIndex = null;
+    let selectedAnswerText = null;
 
-    io.to(pSocketId).emit('question-result', {
-      answered: !!ans,
-      isCorrect: ans ? ans.isCorrect : false,
-      correctAnswer: currentQ.correctAnswer,
-      correctAnswerText: currentQ.options[currentQ.correctAnswer],
-      pointsEarned: ans ? ans.pointsEarned : 0,
-      totalScore: player.score,
-      timeTakenSec: ans ? ans.timeTakenSec.toFixed(2) : null
-    });
+    if (ans) {
+      timedOut = false;
+      selectedOptionIndex = ans.optionIndex;
+      selectedAnswerText = (ans.optionIndex >= 0 && currentQ.options[ans.optionIndex]) ? currentQ.options[ans.optionIndex] : null;
+      if (ans.isCorrect) {
+        resultType = 'CORRECT';
+        isCorrect = true;
+        pointsEarned = ans.pointsEarned || 500;
+      } else {
+        resultType = 'WRONG';
+        isCorrect = false;
+        pointsEarned = 0;
+      }
+    } else {
+      resultType = 'TIMEOUT';
+      isCorrect = false;
+      timedOut = true;
+      pointsEarned = 0;
+      selectedOptionIndex = null;
+      selectedAnswerText = null;
+    }
+
+    const targetSocketId = player.socketId || player.id;
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('question-result', {
+        playerId: player.id,
+        playerName: player.name,
+        resultType: resultType, // 'CORRECT' | 'WRONG' | 'TIMEOUT'
+        isCorrect: isCorrect,
+        timedOut: timedOut,
+        selectedOptionIndex: selectedOptionIndex,
+        selectedAnswerText: selectedAnswerText,
+        correctAnswer: currentQ.correctAnswer,
+        correctAnswerText: currentQ.options[currentQ.correctAnswer],
+        explanation: currentQ.explanation || '',
+        pointsEarned: pointsEarned,
+        totalScore: player.score,
+        timeTakenSec: ans ? ans.timeTakenSec.toFixed(2) : null
+      });
+    }
   });
 }
 
@@ -439,44 +528,121 @@ function getCharacterData(charId, index = 0) {
   return found;
 }
 
-  // 2. Player joins game
+  // 2. Player joins game (with session recovery support)
   socket.on('player-join-game', (data) => {
     const pin = (data.pin || '').toString().trim();
     const name = (data.name || '').trim();
     const roll = (data.roll || '').trim();
     const charId = (data.characterId || '').trim();
+    const playerId = (data.playerId || '').trim() || socket.id;
 
     const game = games[pin];
     if (!game) {
       return socket.emit('join-error', { message: 'Invalid Game PIN. Please check and try again!' });
     }
 
+    // Check if player is reconnecting with existing session (by playerId or matching name)
+    let existingPlayer = game.players[playerId];
+    if (!existingPlayer && name) {
+      existingPlayer = Object.values(game.players).find(p => p.name.toLowerCase() === name.toLowerCase());
+    }
+
+    if (existingPlayer) {
+      // Re-bind to current socket connection
+      existingPlayer.socketId = socket.id;
+      existingPlayer.connected = true;
+      if (roll) existingPlayer.roll = roll;
+      socket.join(pin);
+
+      socket.emit('player-joined-success', {
+        pin: pin,
+        playerId: existingPlayer.id,
+        name: existingPlayer.name,
+        roll: existingPlayer.roll,
+        character: existingPlayer.character,
+        score: existingPlayer.score,
+        totalCorrect: existingPlayer.totalCorrect,
+        isReconnect: true,
+        message: 'Reconnected to game session!'
+      });
+
+      // If reconnected during active question, immediately push current question state
+      if (game.state === 'QUESTION' && game.questions[game.currentQuestionIndex]) {
+        const q = normalizeQuestion(game.questions[game.currentQuestionIndex]);
+        const qIndex = game.currentQuestionIndex;
+        const qAnswers = game.answers[qIndex] || {};
+        const hasAnswered = !!(qAnswers[existingPlayer.id] || qAnswers[socket.id]);
+
+        socket.emit('question-started', {
+          questionIndex: qIndex,
+          totalQuestions: game.questions.length,
+          questionText: q.question,
+          optionsCount: q.options.length,
+          options: q.options,
+          timeLimit: game.timePerQuestion,
+          questionStartTime: game.questionStartTime,
+          questionEndTime: game.questionEndTime,
+          hasAnswered: hasAnswered,
+          sdg: q.sdg || null
+        });
+
+        if (hasAnswered) {
+          const ans = qAnswers[existingPlayer.id] || qAnswers[socket.id];
+          socket.emit('answer-accepted', {
+            optionIndex: ans.optionIndex,
+            selectedAnswerText: q.options[ans.optionIndex],
+            pointsEarned: ans.pointsEarned,
+            totalScore: existingPlayer.score
+          });
+        }
+      }
+
+      const playerList = Object.values(game.players).map(p => ({
+        id: p.id,
+        name: p.name,
+        roll: p.roll,
+        character: p.character
+      }));
+      io.to(game.hostSocketId).emit('player-list-update', {
+        players: playerList,
+        count: playerList.length
+      });
+      return;
+    }
+
     if (game.state !== 'LOBBY') {
       return socket.emit('join-error', { message: 'Game has already started!' });
     }
 
-    const existingName = Object.values(game.players).find(p => p.name.toLowerCase() === name.toLowerCase());
-    if (existingName) {
+    const nameTaken = Object.values(game.players).find(p => p.name.toLowerCase() === name.toLowerCase());
+    if (nameTaken) {
       return socket.emit('join-error', { message: 'Name already taken in this room. Pick another name!' });
     }
 
     const currentCount = Object.keys(game.players).length;
     const charData = getCharacterData(charId, currentCount);
 
-    game.players[socket.id] = {
-      id: socket.id,
+    const newPlayer = {
+      id: playerId,
+      socketId: socket.id,
       name: name,
       roll: roll,
       character: charData,
       score: 0,
-      totalCorrect: 0
+      totalCorrect: 0,
+      connected: true
     };
+    game.players[playerId] = newPlayer;
 
     socket.join(pin);
     socket.emit('player-joined-success', {
       pin: pin,
+      playerId: playerId,
       name: name,
+      roll: roll,
       character: charData,
+      score: 0,
+      totalCorrect: 0,
       message: 'Successfully joined game lobby!'
     });
 
@@ -498,9 +664,11 @@ function getCharacterData(charId, index = 0) {
     if (!game || game.hostSocketId !== socket.id) return;
 
     const playerId = data.playerId;
-    if (game.players[playerId]) {
-      io.to(playerId).emit('kicked-from-game', { message: 'You were removed from the lobby by the host.' });
-      delete game.players[playerId];
+    const targetPlayer = game.players[playerId] || Object.values(game.players).find(p => p.id === playerId || p.socketId === playerId);
+    if (targetPlayer) {
+      const sockId = targetPlayer.socketId || targetPlayer.id;
+      io.to(sockId).emit('kicked-from-game', { message: 'You were removed from the lobby by the host.' });
+      delete game.players[targetPlayer.id];
 
       const playerList = Object.values(game.players).map(p => ({
         id: p.id,
@@ -542,24 +710,32 @@ function getCharacterData(charId, index = 0) {
       game.answers[qIndex] = {};
     }
 
+    startQuestionTimer(pin);
+
     io.to(game.hostSocketId).emit('new-question', {
       questionIndex: qIndex,
       totalQuestions: game.questions.length,
       questionText: q.question,
       options: q.options,
       correctAnswer: q.correctAnswer,
-      timeLimit: game.timePerQuestion
+      timeLimit: game.timePerQuestion,
+      questionStartTime: game.questionStartTime,
+      questionEndTime: game.questionEndTime,
+      sdg: q.sdg || null
     });
 
+    // Authoritative immediately-delivered question event to all players with no artificial delay
     io.to(pin).emit('question-started', {
       questionIndex: qIndex,
       totalQuestions: game.questions.length,
+      questionText: q.question,
       optionsCount: q.options.length,
       options: q.options,
-      timeLimit: game.timePerQuestion
+      timeLimit: game.timePerQuestion,
+      questionStartTime: game.questionStartTime,
+      questionEndTime: game.questionEndTime,
+      sdg: q.sdg || null
     });
-
-    startQuestionTimer(pin);
   }
 
   socket.on('host-skip-timer', (data) => {
@@ -577,16 +753,25 @@ function getCharacterData(charId, index = 0) {
     const game = games[pin];
 
     if (!game || game.state !== 'QUESTION') return;
-    const player = game.players[socket.id];
+
+    // Look up player by socket.id or provided persistent playerId
+    const player = Object.values(game.players).find(p => p.socketId === socket.id || (data.playerId && p.id === data.playerId));
     if (!player) return;
 
     const qIndex = game.currentQuestionIndex;
     if (!game.answers[qIndex]) game.answers[qIndex] = {};
 
-    if (game.answers[qIndex][socket.id]) return;
+    const pKey = player.id;
+    if (game.answers[qIndex][pKey]) return; // Single-submission lock
+
+    // Server authoritative deadline check (750ms network tolerance grace)
+    const now = Date.now();
+    if (game.questionEndTime && now > game.questionEndTime + 750) {
+      return socket.emit('answer-rejected', { reason: 'TIMEOUT', message: 'Time limit expired!' });
+    }
 
     const currentQ = normalizeQuestion(game.questions[qIndex]);
-    const timeTakenSec = Math.max(0.1, (Date.now() - game.questionStartTime) / 1000);
+    const timeTakenSec = Math.max(0.1, (now - game.questionStartTime) / 1000);
     const isCorrect = (optionIndex === currentQ.correctAnswer);
 
     let pointsEarned = 0;
@@ -596,7 +781,8 @@ function getCharacterData(charId, index = 0) {
       player.totalCorrect += 1;
     }
 
-    game.answers[qIndex][socket.id] = {
+    game.answers[qIndex][pKey] = {
+      playerId: player.id,
       socketId: socket.id,
       playerName: player.name,
       optionIndex: optionIndex,
@@ -607,9 +793,12 @@ function getCharacterData(charId, index = 0) {
 
     socket.emit('answer-accepted', {
       optionIndex: optionIndex,
-      pointsEarned: pointsEarned
+      selectedAnswerText: currentQ.options[optionIndex],
+      pointsEarned: pointsEarned,
+      totalScore: player.score
     });
 
+    const activePlayers = Object.values(game.players).filter(p => p.connected !== false);
     const answeredCount = Object.keys(game.answers[qIndex]).length;
     const totalPlayers = Object.keys(game.players).length;
 
@@ -618,7 +807,8 @@ function getCharacterData(charId, index = 0) {
       totalPlayers: totalPlayers
     });
 
-    if (answeredCount >= totalPlayers) {
+    // When all active players have submitted, immediately conclude question
+    if (activePlayers.length > 0 && answeredCount >= activePlayers.length) {
       endQuestion(pin);
     }
   });
@@ -689,18 +879,24 @@ function getCharacterData(charId, index = 0) {
   socket.on('disconnect', () => {
     Object.keys(games).forEach(pin => {
       const game = games[pin];
-      if (game.players[socket.id]) {
-        delete game.players[socket.id];
-        const playerList = Object.values(game.players).map(p => ({
-          id: p.id,
-          name: p.name,
-          roll: p.roll,
-          character: p.character
-        }));
-        io.to(game.hostSocketId).emit('player-list-update', {
-          players: playerList,
-          count: playerList.length
-        });
+      const player = Object.values(game.players).find(p => p.socketId === socket.id);
+      if (player) {
+        if (game.state === 'LOBBY') {
+          delete game.players[player.id];
+          const playerList = Object.values(game.players).map(p => ({
+            id: p.id,
+            name: p.name,
+            roll: p.roll,
+            character: p.character
+          }));
+          io.to(game.hostSocketId).emit('player-list-update', {
+            players: playerList,
+            count: playerList.length
+          });
+        } else {
+          // Keep student session & score alive during active quiz for reconnect
+          player.connected = false;
+        }
       }
     });
   });

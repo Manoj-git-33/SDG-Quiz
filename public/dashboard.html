@@ -6,7 +6,8 @@
   <title>Student List & Results Dashboard - Live Quiz</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=30">
+  <script src="config.js"></script>
 </head>
 <body class="host-body gaming-theme">
 
@@ -135,7 +136,8 @@
 
     async function loadDashboardData() {
       try {
-        const res = await fetch('/api/dashboard');
+        const baseUrl = (typeof window.getQuizSocketUrl === 'function') ? window.getQuizSocketUrl() : '';
+        const res = await fetch(`${baseUrl}/api/dashboard`);
         if (res.ok) {
           globalDashboardData = await res.json();
           renderDashboard();

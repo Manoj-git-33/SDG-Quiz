@@ -13,9 +13,9 @@ start cmd /k "node server.js"
 timeout /t 2 > nul
 
 :: Open Host view in default browser
-start http://localhost:3000/host.html
+start http://localhost:3001/host.html
 
 echo.
-echo ✅ Server started! Host screen opened at http://localhost:3000/host.html
+echo ✅ Server started! Host screen opened at http://localhost:3001/host.html
 echo.
 pause

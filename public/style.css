@@ -7018,6 +7018,426 @@ body.room-created-active,
   margin-top: 1rem !important;
 }
 
+/* =====================================================================
+   🎮 MULTIPLAYER PLAYER MOBILE VIEW & REALTIME GAMING HUD (V30)
+   ===================================================================== */
+
+/* 1. TOP LIVE MULTIPLAYER HUD */
+.player-live-hud {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  padding: 0.6rem 0.8rem !important;
+  margin-bottom: 0.75rem !important;
+  background: rgba(10, 17, 34, 0.85) !important;
+  border: 1px solid rgba(0, 229, 255, 0.3) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+.hud-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+}
+
+.hud-connection {
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  letter-spacing: 0.5px !important;
+  color: #00ff88 !important;
+}
+
+.hud-connection.reconnecting {
+  color: #ffaa00 !important;
+}
+
+.hud-connection .pulse-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #00ff88 !important;
+  box-shadow: 0 0 8px #00ff88 !important;
+  display: inline-block !important;
+  animation: pulseGlow 1.4s infinite !important;
+}
+
+.hud-connection.reconnecting .pulse-dot {
+  background: #ffaa00 !important;
+  box-shadow: 0 0 8px #ffaa00 !important;
+}
+
+.hud-player-info {
+  background: rgba(255, 255, 255, 0.06) !important;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  max-width: 140px !important;
+}
+
+.hud-avatar-thumb {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 1.5px solid #00e5ff !important;
+}
+
+.hud-name {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.hud-score-box {
+  background: linear-gradient(135deg, rgba(255, 230, 0, 0.15), rgba(255, 170, 0, 0.05)) !important;
+  border: 1px solid rgba(255, 230, 0, 0.4) !important;
+  border-radius: 8px !important;
+  padding: 3px 8px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+}
+
+.hud-score-label {
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  color: #ffe600 !important;
+  letter-spacing: 0.5px !important;
+  margin-right: 2px !important;
+}
+
+.hud-score-val {
+  font-size: 0.95rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+}
+
+/* 2. QUESTION HEADER & AUTHORITATIVE COUNTDOWN TIMER */
+.player-question-header-hud {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 0.75rem !important;
+  gap: 0.5rem !important;
+}
+
+.player-q-counter-box {
+  background: rgba(0, 229, 255, 0.12) !important;
+  border: 1px solid rgba(0, 229, 255, 0.4) !important;
+  border-radius: 10px !important;
+  padding: 4px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.q-counter-label {
+  font-size: 0.65rem !important;
+  font-weight: 800 !important;
+  color: #00d2ff !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1 !important;
+}
+
+.q-counter-number {
+  font-size: 0.95rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+}
+
+.player-timer-sync-badge {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(10, 17, 34, 0.95)) !important;
+  border: 2px solid #00e5ff !important;
+  border-radius: 12px !important;
+  padding: 4px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.timer-sync-label {
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  color: #00e5ff !important;
+  letter-spacing: 0.5px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+}
+
+.timer-sync-val {
+  font-size: 1.4rem !important;
+  font-weight: 900 !important;
+  color: #ffffff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  min-width: 28px !important;
+  text-align: center !important;
+}
+
+.player-timer-sync-badge.urgent-warning {
+  border-color: #ff2a4b !important;
+  background: linear-gradient(135deg, rgba(255, 42, 75, 0.25), rgba(153, 0, 24, 0.35)) !important;
+  box-shadow: 0 0 20px rgba(255, 42, 75, 0.7) !important;
+  animation: urgentPulse 0.5s infinite alternate !important;
+}
+
+.player-timer-sync-badge.urgent-warning .timer-sync-label,
+.player-timer-sync-badge.urgent-warning .timer-sync-val {
+  color: #ff2a4b !important;
+}
+
+@keyframes urgentPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+/* 3. QUESTION PROMPT CARD */
+.player-question-card {
+  background: rgba(15, 23, 42, 0.88) !important;
+  border: 1.5px solid rgba(0, 229, 255, 0.35) !important;
+  border-radius: 16px !important;
+  padding: 1rem 1.1rem !important;
+  margin-bottom: 0.9rem !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.05) !important;
+}
+
+.player-sdg-tag {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  color: #ffe600 !important;
+  letter-spacing: 0.6px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  margin-bottom: 0.35rem !important;
+  text-transform: uppercase !important;
+}
+
+.player-question-prompt {
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+}
+
+/* 4. ANSWER LOCKED FEEDBACK CARD */
+.answer-locked-card {
+  padding: 2.2rem 1.4rem !important;
+  text-align: center !important;
+  margin-top: 0.5rem !important;
+}
+
+.answer-locked-icon-pulse {
+  font-size: 3.2rem !important;
+  color: #00ff88 !important;
+  margin-bottom: 0.75rem !important;
+  filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.6)) !important;
+  animation: pulseGlow 1.5s infinite !important;
+}
+
+.answer-locked-title {
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
+  color: #00ff88 !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  letter-spacing: 0.8px !important;
+  margin: 0 0 0.8rem 0 !important;
+}
+
+.locked-choice-bubble {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(0, 229, 255, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 0.65rem 1rem !important;
+  display: inline-block !important;
+  margin-bottom: 0.8rem !important;
+  max-width: 90% !important;
+}
+
+.locked-choice-sub {
+  font-size: 0.75rem !important;
+  color: #94a3b8 !important;
+  display: block !important;
+  margin-bottom: 2px !important;
+}
+
+.locked-choice-name {
+  font-size: 1rem !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.answer-locked-wait {
+  font-size: 0.85rem !important;
+  color: #cbd5e1 !important;
+  margin: 0 !important;
+}
+
+/* 5. RESULT 3-STATE STYLES: TIME OUT THEME */
+.result-timeout-theme::before {
+  background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%) !important;
+  filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.45)) !important;
+}
+
+.emblem-timeout {
+  position: absolute !important;
+  top: -45px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.emblem-center-circle-timeout {
+  width: 76px !important;
+  height: 76px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #f59e0b 0%, #b45309 100%) !important;
+  border: 4px solid #fbbf24 !important;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 2.3rem !important;
+  color: #ffffff !important;
+}
+
+.result-title-timeout {
+  font-size: 2.8rem !important;
+  font-weight: 900 !important;
+  font-style: italic !important;
+  color: #fbbf24 !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  letter-spacing: 1px !important;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.8), 0 3px 8px rgba(0, 0, 0, 0.9) !important;
+  margin-top: 0.6rem !important;
+  margin-bottom: 0.5rem !important;
+  text-transform: uppercase !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+.timeout-points-banner,
+.zero-points-banner {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+}
+
+.timeout-points-banner .points-text,
+.zero-points-banner .points-text {
+  color: #94a3b8 !important;
+  text-shadow: none !important;
+}
+
+.timeout-notice-banner {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px dashed rgba(245, 158, 11, 0.5) !important;
+  border-radius: 12px !important;
+  padding: 0.6rem 0.8rem !important;
+  margin: 0.75rem auto !important;
+  max-width: 90% !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+.timeout-notice-text {
+  font-size: 0.85rem !important;
+  color: #fde68a !important;
+  font-weight: 600 !important;
+}
+
+.timeout-correct-box {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  background: rgba(15, 23, 42, 0.7) !important;
+}
+
+.submitted-answer-preview {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-radius: 10px !important;
+  padding: 0.45rem 0.8rem !important;
+  margin: 0.5rem auto !important;
+  max-width: 90% !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+.submitted-answer-preview .preview-label {
+  color: #94a3b8 !important;
+}
+
+.submitted-answer-preview .preview-val {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* 6. MOBILE PHONE SCREEN RESPONSIVENESS (320px - 430px) */
+@media screen and (max-width: 480px) {
+  .player-body {
+    padding: 0.5rem !important;
+  }
+
+  .player-phone-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.75rem !important;
+    border-radius: 16px !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Option Buttons Touch Targets (Min 48px on Mobile) */
+  .player-options-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .mockup-card-outer.player-opt-btn {
+    min-height: 52px !important;
+    padding: 0.75rem 0.9rem !important;
+  }
+
+  .mockup-card-text {
+    font-size: 1rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Compact result title for narrow screens (320px - 360px) */
+  .result-title-correct,
+  .result-title-wrong,
+  .result-title-timeout {
+    font-size: 2.2rem !important;
+  }
+
+  .points-brush-banner {
+    padding: 0.35rem 1.4rem !important;
+  }
+
+  .points-brush-banner .points-text {
+    font-size: 1.5rem !important;
+  }
+
+  .result-stats-row {
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+  }
+
+  .stat-pill-box {
+    padding: 0.5rem !important;
+  }
+
+  .stat-value-cyan,
+  .stat-value-gold {
+    font-size: 0.95rem !important;
+  }
+}
+
 
 
 
