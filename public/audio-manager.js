@@ -31,11 +31,13 @@ class AudioManagerClass {
 
     this.SOUNDS = {
       LOBBY_BGM: '/audio/music/free_fire.mp3',
-      GAME_START: '/audio/game/game_start.mp3',
-      TIME_UP: '/audio/game/time_up.mp3',
+      GAME_START: '/audio/game/game-start.mpeg',
+      PLAYER_JOIN: '/audio/game/player_join.mp3',
+      TIME_UP: '/audio/game/time-up.mpeg',
       VICTORY_BGM: '/audio/music/victory.mp3',
-      CORRECT_ANSWER: '/audio/game/correct_answer.mp3',
-      WRONG_ANSWER: '/audio/game/wrong_answer.mp3'
+      CORRECT_ANSWER: '/audio/game/correct-answer.mpeg',
+      WRONG_ANSWER: '/audio/game/wrong-answer.mpeg',
+      LEVEL_UP: '/audio/game/levelup.mp3'
     };
     this.correctAudio = null;
 
@@ -294,7 +296,9 @@ class AudioManagerClass {
   // =========================================================================
   // 🔇 DISABLED / EXTRA SOUND NO-OPS (PREVENTS ANY UNNECESSARY NOISE)
   // =========================================================================
-  playerJoin() {}
+  playerJoin() {
+    this.playSFX(this.SOUNDS.PLAYER_JOIN, 1.0);
+  }
   playerLeave() {}
   playerCount() {}
   roomFull() {}
@@ -306,7 +310,11 @@ class AudioManagerClass {
   questionReveal() {}
   answerSelect() {}
   timeWarning() {}
-  leaderboardOpen() {}
+  leaderboardOpen() {
+    this.stopTimeoutAudio();
+    this.stopCorrectAudio();
+    this.playSFX(this.SOUNDS.LEVEL_UP, 1.0);
+  }
   rankUp() {}
   rankDown() {}
   victory() {

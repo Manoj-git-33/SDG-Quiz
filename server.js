@@ -60,9 +60,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Root directly opens Host Screen
+// Root serves Index Landing Page
 app.get('/', (req, res) => {
-  res.redirect('/host.html');
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
 // Serve static files both at root / and /public/ route
@@ -692,9 +692,18 @@ function getCharacterData(charId, index = 0) {
       return socket.emit('error-msg', { message: 'Cannot start game without players in lobby!' });
     }
 
-    game.state = 'QUESTION';
-    game.currentQuestionIndex = 0;
-    sendQuestion(data.pin);
+    if (game.state === 'STARTING') return;
+    game.state = 'STARTING';
+
+    io.to(data.pin).emit('game-starting-countdown', { count: 3 });
+
+    setTimeout(() => {
+      if (game.state === 'STARTING') {
+        game.state = 'QUESTION';
+        game.currentQuestionIndex = 0;
+        sendQuestion(data.pin);
+      }
+    }, 3000);
   });
 
   function sendQuestion(pin) {
@@ -834,13 +843,13 @@ function getCharacterData(charId, index = 0) {
     const isLastQuestion = game.currentQuestionIndex >= game.questions.length - 1;
 
     io.to(game.hostSocketId).emit('leaderboard-data', {
-      leaderboard: sortedPlayers.slice(0, 5),
+      leaderboard: sortedPlayers,
       fullLeaderboard: sortedPlayers,
       isLastQuestion: isLastQuestion
     });
 
     io.to(data.pin).emit('player-leaderboard-update', {
-      leaderboard: sortedPlayers.slice(0, 5),
+      leaderboard: sortedPlayers,
       isLastQuestion: isLastQuestion
     });
   });

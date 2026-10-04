@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css?v=30">
+  <script>
+    if (sessionStorage.getItem('host_authenticated') !== 'true') {
+      window.location.replace('/index.html?auth=required');
+    }
+  </script>
   <script src="config.js"></script>
 </head>
 <body class="host-body gaming-theme">
@@ -230,41 +235,58 @@
     </div>
 
     <!-- 6️⃣ GAME OVER STAGE (PODIUM) -->
+    <!-- 6️⃣ GAME OVER STAGE (BOOYAH WINNER PAGE - 1:1 MATCH MOCKUP) -->
     <div id="hostGameOverStage" style="display: none;">
-      <div class="game-over-header">
-        <h1 class="yellow-text">🎉 Game Completed!</h1>
-        <p class="subtitle-gaming">Congratulations to the top performers!</p>
+      <!-- BOOYAH BRUSH TITLE BANNER -->
+      <div class="booyah-victory-header">
+        <div class="booyah-banner-brush">
+          <h1 class="booyah-title-text">BOOYAH!</h1>
+          <div class="booyah-subtitle-text">QUIZ COMPLETED!</div>
+        </div>
       </div>
 
-      <div id="podiumContainer" class="podium-wrapper"></div>
+      <!-- 3D PODIUM STAGE (TOP 3 PLAYERS) -->
+      <div id="podiumContainer" class="podium-wrapper-gaming"></div>
 
-      <div class="scoreboard-section-gaming margin-top">
-        <h3 class="cyan-text">Full Player Scoreboard</h3>
-        <table class="table-scoreboard-gaming">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Player Name</th>
-              <th>Roll No</th>
-              <th>Total Score</th>
-              <th>Correct Answers</th>
-            </tr>
-          </thead>
-          <tbody id="fullScoreboardBody"></tbody>
-        </table>
+      <!-- FULL PLAYER SCOREBOARD (GOLD CHAMFERED CARD) -->
+      <div class="scoreboard-card-booyah margin-top">
+        <div class="scoreboard-header-booyah">
+          <span class="crown-icon-gold">👑</span>
+          <span class="white-text font-extrabold">Top 3 Winners</span>
+          <span class="yellow-text font-extrabold">Scoreboard</span>
+        </div>
+
+        <div class="table-responsive-gaming">
+          <table class="table-scoreboard-gaming">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player Name</th>
+                <th>Roll No</th>
+                <th>Total Score</th>
+                <th>Correct Answers</th>
+              </tr>
+            </thead>
+            <tbody id="fullScoreboardBody"></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="action-bar-gaming margin-top">
-        <button class="btn-create-gaming" onclick="window.location.reload()">
-          🔄 Host Another Quiz
+        <button class="btn-create-gaming btn-gold-chamfer pulse-glow" onclick="window.location.reload()">
+          🔄 Host Another Quiz ➔
         </button>
       </div>
+    </div>
     <!-- 📊 LIVE IN-PAGE DASHBOARD OVERLAY MODAL -->
     <div id="hostDashboardModal" class="dashboard-modal-backdrop" style="display: none;" onclick="if(event.target===this) HostApp.toggleDashboardModal(false)">
       <div class="dashboard-modal-box">
         <div class="dashboard-modal-header">
           <h3>📊 Live Student Leaderboard & Connected Dashboard</h3>
           <div style="display: flex; gap: 0.8rem; align-items: center;">
+            <button class="btn-refresh-gaming" onclick="HostApp.updateDashboardModalData(true)" title="Refresh All Live Student Data">
+              <i class="fa-solid fa-rotate"></i> Refresh All 🔄
+            </button>
             <a href="dashboard.html" target="_blank" class="control-pill-gaming" style="font-size: 0.85rem;" title="Open in Full Tab">Full Page ↗</a>
             <button class="btn-close-modal" onclick="HostApp.toggleDashboardModal(false)">✕ Close & Resume Game</button>
           </div>

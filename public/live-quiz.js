@@ -452,14 +452,6 @@ window.HostApp = {
   toggleSound() {
     let isMuted;
     if (window.AudioManager) {
-      if (!window.AudioManager.isBgmPlaying && !window.AudioManager.muted) {
-        window.AudioManager.startLobbyMusic();
-        const btn = document.getElementById('soundToggleBtn');
-        if (btn) btn.innerHTML = '🔊 Sound On';
-        const lobbyLabel = document.getElementById('lobbyMusicLabel');
-        if (lobbyLabel) lobbyLabel.innerHTML = 'Active 🔊';
-        return;
-      }
       isMuted = window.AudioManager.toggleMute();
     } else {
       SoundFX.muted = !SoundFX.muted;
@@ -495,9 +487,17 @@ window.HostApp = {
     }
   },
 
-  async updateDashboardModalData() {
+  async updateDashboardModalData(forceRefresh = false) {
     const body = document.getElementById('hostDashboardModalBody');
     if (!body) return;
+
+    if (forceRefresh) {
+      body.innerHTML = `
+        <div style="text-align: center; padding: 3rem;">
+          <div class="cyan-text font-bold" style="font-size: 1.3rem;"><i class="fa-solid fa-spinner fa-spin"></i> Refreshing All Student Data...</div>
+        </div>
+      `;
+    }
 
     try {
       const res = await fetch('/api/dashboard');
@@ -524,7 +524,7 @@ window.HostApp = {
         }
       });
 
-      // 2. Fallback to historical student records if no active room players
+      // 3. Fallback to historical student records if no active room players
       if (players.length === 0) {
         historical.forEach(rec => {
           if (Array.isArray(rec.results)) {
@@ -547,43 +547,103 @@ window.HostApp = {
         <div class="modal-stats-grid margin-bottom">
           <div class="stat-pill-box pill-cyan" style="padding: 0.8rem 1rem;">
             <div class="stat-text-wrapper">
-              <div class="stat-label-sub">Connected Players</div>
+              <div class="stat-label-sub">Connected Live Students</div>
               <div class="stat-value-cyan" style="font-size: 1.6rem;">${players.length}</div>
             </div>
           </div>
           <div class="stat-pill-box pill-gold" style="padding: 0.8rem 1rem;">
             <div class="stat-text-wrapper">
               <div class="stat-label-sub">Current Top Leader</div>
-              <div class="stat-value-gold" style="font-size: 1.4rem;">${players[0] ? `${players[0].name} (${players[0].score} pts)` : 'None'}</div>
+              <div class="stat-value-gold" style="font-size: 1.4rem;">${players[0] ? `${players[0].name} (${players[0].score || 0} pts)` : 'None'}</div>
             </div>
           </div>
         </div>
 
-        <h4 class="cyan-text margin-top-sm"><i class="fa-solid fa-ranking-star"></i> All Player Rankings (Sorted by Highest Points)</h4>
-        <div class="player-grid margin-top-sm">
-          ${players.map((p, idx) => {
-            const medal = medals[idx] || `#${idx + 1}`;
-            const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
-            const charName = String(char.name || 'Alok');
-            return `
-              <div class="gaming-player-card" style="--char-color: ${char.color || '#00d2ff'}">
-                <div class="char-avatar-wrapper">
-                  <img src="${char.avatar || '/avatars/alok.jpg'}" alt="${escapeHtml(charName)}" class="char-avatar-img" onerror="this.src='/avatars/alok.jpg'">
-                  <span class="char-badge-tag">${medal} ${escapeHtml(charName.toUpperCase())}</span>
-                </div>
-                <div class="player-info-block">
-                  <span class="player-name-text">${escapeHtml(p.name || 'Student')}</span>
-                  <span class="player-roll-text">${p.roll ? `Roll: ${escapeHtml(p.roll)} | ` : ''}Points: <strong class="yellow-text" style="font-size: 1.1rem;">${p.score || 0} pts</strong></span>
-                </div>
-              </div>
-            `;
-          }).join('') || '<p class="subtitle-gaming">No student records found right now.</p>'}
+        <!-- EXCEL SPREADSHEET TOOLBAR -->
+        <div class="excel-toolbar-bar">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <h4 class="cyan-text" style="margin: 0; font-size: 1.1rem;"><i class="fa-solid fa-file-excel"></i> Student Excel Record Sheet</h4>
+            <span class="control-pill-gaming" style="font-size: 0.75rem; padding: 2px 8px;">${players.length} Total Row(s)</span>
+          </div>
+          <div style="display: flex; gap: 0.6rem; align-items: center;">
+            <div style="position: relative;">
+              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #00d2ff; font-size: 0.85rem;"></i>
+              <input type="text" id="excelModalSearch" class="excel-search-input" placeholder="Filter name, roll or char..." oninput="HostApp.filterExcelTable(this.value)">
+            </div>
+            <button class="btn-refresh-gaming" onclick="HostApp.updateDashboardModalData(true)" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+              <i class="fa-solid fa-rotate"></i> Refresh 🔄
+            </button>
+          </div>
+        </div>
+
+        <!-- EXCEL SPREADSHEET TABLE -->
+        <div class="excel-table-container">
+          <table class="excel-table">
+            <thead>
+              <tr>
+                <th style="width: 70px; text-align: center;">Rank</th>
+                <th>Student Name</th>
+                <th>Roll Number</th>
+                <th>Character</th>
+                <th>Total Score</th>
+                <th>Accuracy</th>
+                <th style="text-align: center;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="excelTableBody">
+              ${players.map((p, idx) => {
+                const medal = medals[idx] || `#${idx + 1}`;
+                const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
+                const charName = String(char.name || 'Alok');
+                const rowClass = idx === 0 ? 'row-rank-1' : '';
+                const scoreColor = idx === 0 ? 'text-yellow' : (idx === 1 ? 'text-cyan' : (idx === 2 ? 'text-bronze' : 'text-white'));
+
+                return `
+                  <tr class="${rowClass}" data-search="${escapeHtml((p.name || '') + ' ' + (p.roll || '') + ' ' + charName).toLowerCase()}">
+                    <td style="text-align: center;"><strong style="font-size: 1.05rem;">${medal}</strong></td>
+                    <td style="font-weight: 700; color: #ffffff;">
+                      <img src="${char.avatar || '/avatars/alok.jpg'}" class="table-avatar-img" alt="" onerror="this.src='/avatars/alok.jpg'">
+                      ${escapeHtml(p.name || 'Student')}
+                    </td>
+                    <td><span style="font-family: monospace; font-size: 0.95rem; color: #cbd5e1;">${escapeHtml(p.roll || '-')}</span></td>
+                    <td><span class="char-sub-tag" style="margin: 0;">${escapeHtml(charName)}</span></td>
+                    <td><strong class="${scoreColor}" style="font-size: 1.1rem;">${p.score || 0} pts</strong></td>
+                    <td>${p.totalCorrect !== undefined ? `${p.totalCorrect} Correct` : '-'}</td>
+                    <td style="text-align: center;">
+                      <span class="control-pill-gaming" style="font-size: 0.75rem; background: rgba(0, 230, 64, 0.15); border-color: #00e640; color: #00ff88;">
+                        ● CONNECTED
+                      </span>
+                    </td>
+                  </tr>
+                `;
+              }).join('') || `
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 2.5rem; color: #94a3b8;">
+                    No student records found right now. Click Refresh 🔄 to update.
+                  </td>
+                </tr>
+              `}
+            </tbody>
+          </table>
         </div>
       `;
     } catch (err) {
       console.warn('Failed to update dashboard modal:', err);
       body.innerHTML = `<p class="subtitle-gaming">Error loading live data. Please try refreshing.</p>`;
     }
+  },
+
+  filterExcelTable(query) {
+    const q = (query || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('#excelTableBody tr');
+    rows.forEach(row => {
+      const searchData = row.dataset.search || '';
+      if (!q || searchData.includes(q)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
   },
 
   bindSocketEvents() {
@@ -611,6 +671,11 @@ window.HostApp = {
     });
 
     socket.on('player-list-update', (data) => {
+      if (window.AudioManager && this._prevPlayerCount !== undefined && data.count > this._prevPlayerCount) {
+        window.AudioManager.playerJoin();
+      }
+      this._prevPlayerCount = data.count;
+
       const listEl = document.getElementById('playerList');
       const countEl = document.getElementById('playerCount');
       if (countEl) countEl.textContent = data.count;
@@ -640,9 +705,15 @@ window.HostApp = {
       }
     });
 
+    socket.on('game-starting-countdown', (data) => {
+      triggerGameStartCountdown(data.count || 3);
+    });
+
     socket.on('new-question', (data) => {
+      const overlay = document.getElementById('gameStartCountdownOverlay');
+      if (overlay) overlay.style.display = 'none';
       if (window.AudioManager) {
-        window.AudioManager.startLobbyMusic();
+        window.AudioManager.stopBGM(0);
       }
       showHostStage('hostQuestionStage');
       this.currentQuestion = data;
@@ -789,6 +860,10 @@ window.HostApp = {
     socket.on('leaderboard-data', (data) => {
       showHostStage('hostLeaderboardStage');
 
+      if (window.AudioManager) {
+        window.AudioManager.leaderboardOpen();
+      }
+
       const nextBtn = document.getElementById('nextQBtn');
       if (data.isLastQuestion) {
         nextBtn.textContent = 'Finish Quiz & View Podium 🏆';
@@ -797,23 +872,124 @@ window.HostApp = {
       }
 
       const boardEl = document.getElementById('leaderboardList');
-      boardEl.innerHTML = data.leaderboard.map((player) => {
-        const medals = ['🥇', '🥈', '🥉'];
-        const medal = medals[player.rank - 1] || `#${player.rank}`;
+      if (!boardEl) return;
+
+      if (!this._prevRanks) this._prevRanks = {};
+
+      const leaderboardList = data.leaderboard || [];
+      const medals = ['🥇', '🥈', '🥉'];
+      const currentRanks = {};
+
+      // -------------------------------------------------------------
+      // PHASE 1: Render cards at OLD positions with FADE & APPEAR entry
+      // -------------------------------------------------------------
+      let initialDisplayOrder = [...leaderboardList];
+      if (Object.keys(this._prevRanks).length > 0) {
+        initialDisplayOrder.sort((a, b) => {
+          const rankA = this._prevRanks[a.id || a.name] !== undefined ? this._prevRanks[a.id || a.name] : a.rank;
+          const rankB = this._prevRanks[b.id || b.name] !== undefined ? this._prevRanks[b.id || b.name] : b.rank;
+          return rankA - rankB;
+        });
+      }
+
+      boardEl.innerHTML = initialDisplayOrder.map((player, idx) => {
+        const playerKey = String(player.id || player.name);
+        const prevRank = this._prevRanks[playerKey];
+        currentRanks[playerKey] = player.rank;
+
+        const displayRank = (prevRank !== undefined) ? prevRank : player.rank;
+        const medal = medals[displayRank - 1] || `#${displayRank}`;
         const char = player.character || { avatar: '/avatars/alok.jpg', color: '#00d2ff', name: 'Alok' };
+
         return `
-          <div class="leaderboard-row rank-${player.rank} animated-slide-up" style="--char-color: ${char.color}">
-            <div class="rank-badge">${medal}</div>
+          <div class="leaderboard-row rank-${displayRank} leaderboard-card-fade-in" 
+               id="lbCard_${escapeHtml(playerKey)}" 
+               data-player-key="${escapeHtml(playerKey)}" 
+               style="--char-color: ${char.color}; animation-delay: ${idx * 0.18}s;">
+            <div class="rank-badge" id="lbMedal_${escapeHtml(playerKey)}">${medal}</div>
             <img src="${char.avatar}" class="leaderboard-avatar-img" alt="${char.name}" onerror="this.src='/avatars/alok.jpg'">
             <div class="player-name">
               ${escapeHtml(player.name)} 
               <span class="char-sub-tag">${escapeHtml(char.name)}</span>
               ${player.roll ? `<small>(${escapeHtml(player.roll)})</small>` : ''}
+              <span id="lbBadge_${escapeHtml(playerKey)}"></span>
             </div>
-            <div class="player-score">${player.score} pts</div>
+            <div class="player-score" id="lbScore_${escapeHtml(playerKey)}">${player.score} pts</div>
           </div>
         `;
       }).join('');
+
+      const oldRanksMap = { ...this._prevRanks };
+      this._prevRanks = currentRanks;
+
+      // -------------------------------------------------------------
+      // PHASE 2: Trigger RANK-WISE MOVEMENTS after cards appear (~1150ms)
+      // -------------------------------------------------------------
+      setTimeout(() => {
+        // Record old top bounding rect for each player card
+        const oldTopMap = new Map();
+        Array.from(boardEl.children).forEach(child => {
+          const key = child.dataset.playerKey;
+          if (key) {
+            oldTopMap.set(key, child.getBoundingClientRect().top);
+          }
+        });
+
+        // Re-order DOM elements into NEW rank order & update badges/glows
+        leaderboardList.forEach(player => {
+          const playerKey = String(player.id || player.name);
+          const cardEl = document.getElementById(`lbCard_${playerKey}`);
+          const prevRank = oldRanksMap[playerKey];
+
+          if (cardEl) {
+            boardEl.appendChild(cardEl);
+
+            const medalEl = document.getElementById(`lbMedal_${playerKey}`);
+            if (medalEl) {
+              const medal = medals[player.rank - 1] || `#${player.rank}`;
+              medalEl.innerHTML = medal;
+            }
+
+            const badgeEl = document.getElementById(`lbBadge_${playerKey}`);
+            cardEl.classList.remove('rank-up-glow', 'rank-down-glow', 'leaderboard-card-fade-in');
+
+            if (prevRank !== undefined) {
+              if (player.rank < prevRank) {
+                const diff = prevRank - player.rank;
+                if (badgeEl) badgeEl.innerHTML = `<span class="rank-change-badge rank-up-badge"><i class="fa-solid fa-arrow-up"></i> +${diff} ${diff === 1 ? 'Rank' : 'Ranks'}!</span>`;
+                cardEl.classList.add('rank-up-glow');
+              } else if (player.rank > prevRank) {
+                const diff = player.rank - prevRank;
+                if (badgeEl) badgeEl.innerHTML = `<span class="rank-change-badge rank-down-badge"><i class="fa-solid fa-arrow-down"></i> -${diff}</span>`;
+                cardEl.classList.add('rank-down-glow');
+              } else {
+                if (badgeEl) badgeEl.innerHTML = `<span class="rank-change-badge rank-same-badge">● Same</span>`;
+              }
+            }
+          }
+        });
+
+        // Apply FLIP Y-axis glide transition to animate cards sliding up/down
+        Array.from(boardEl.children).forEach(newEl => {
+          const key = newEl.dataset.playerKey;
+          const oldTop = oldTopMap.get(key);
+          if (oldTop !== undefined) {
+            const newTop = newEl.getBoundingClientRect().top;
+            const deltaY = oldTop - newTop;
+
+            if (Math.abs(deltaY) > 1) {
+              newEl.style.transition = 'none';
+              newEl.style.transform = `translateY(${deltaY}px)`;
+
+              requestAnimationFrame(() => {
+                newEl.offsetHeight; // Force reflow
+                newEl.style.transition = 'transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                newEl.style.transform = 'translateY(0)';
+              });
+            }
+          }
+        });
+      }, 1150);
     });
 
     socket.on('game-over', (data) => {
@@ -840,44 +1016,97 @@ window.HostApp = {
       const c3 = top3[2]?.character || { avatar: '/avatars/alok.jpg', name: 'Hayato' };
 
       podiumEl.innerHTML = `
-        <div class="podium-step step-2">
-          ${top3[1] ? `<img src="${c2.avatar}" class="podium-avatar-img" alt="${c2.name}" onerror="this.src='/avatars/alok.jpg'">` : ''}
-          <div class="podium-rank">2nd</div>
-          <div class="podium-name">${escapeHtml(p2)}</div>
-          <div class="podium-score">${s2} pts</div>
-          <div class="podium-block"></div>
+        <!-- RANK 2 (SILVER - LEFT) -->
+        <div class="podium-step-gaming step-2-booyah">
+          <div class="podium-avatar-halo ring-silver">
+            <span class="avatar-crown-icon crown-silver">👑</span>
+            ${top3[1] ? `<img src="${c2.avatar}" class="podium-avatar-img-booyah" alt="${escapeHtml(c2.name)}" onerror="this.src='/avatars/alok.jpg'">` : `<div class="default-avatar-placeholder"><i class="fa-solid fa-user"></i></div>`}
+          </div>
+          <div class="rank-hex-badge hex-silver">2</div>
+          <div class="podium-player-name">${escapeHtml(p2)}${top3[1] ? ` (${escapeHtml(c2.name)})` : ''}</div>
+          <div class="podium-score-pill pill-silver">${s2} pts</div>
+          <div class="podium-3d-block block-silver">
+            <div class="podium-cap-bevel cap-silver"></div>
+            <div class="podium-block-content">
+              <div class="podium-giant-rank text-silver">2</div>
+              <div class="podium-block-title badge-silver">RUNNER UP</div>
+            </div>
+            <div class="podium-side-beam beam-silver left"></div>
+            <div class="podium-side-beam beam-silver right"></div>
+          </div>
         </div>
-        <div class="podium-step step-1">
-          <div class="podium-crown">👑</div>
-          ${top3[0] ? `<img src="${c1.avatar}" class="podium-avatar-img" alt="${c1.name}" onerror="this.src='/avatars/alok.jpg'">` : ''}
-          <div class="podium-rank">1st</div>
-          <div class="podium-name">${escapeHtml(p1)}</div>
-          <div class="podium-score">${s1} pts</div>
-          <div class="podium-block"></div>
+
+        <!-- RANK 1 (GOLD - CENTER) -->
+        <div class="podium-step-gaming step-1-booyah">
+          <div class="podium-avatar-halo ring-gold">
+            <span class="avatar-crown-icon crown-gold">👑</span>
+            ${top3[0] ? `<img src="${c1.avatar}" class="podium-avatar-img-booyah" alt="${escapeHtml(c1.name)}" onerror="this.src='/avatars/alok.jpg'">` : `<div class="default-avatar-placeholder"><i class="fa-solid fa-user"></i></div>`}
+          </div>
+          <div class="rank-hex-badge hex-gold">1</div>
+          <div class="podium-player-name">${escapeHtml(p1)}${top3[0] ? ` (${escapeHtml(c1.name)})` : ''}</div>
+          <div class="podium-score-pill pill-gold">${s1} pts</div>
+          <div class="podium-3d-block block-gold">
+            <div class="podium-cap-bevel cap-gold"></div>
+            <div class="podium-block-content">
+              <div class="podium-giant-rank text-gold">1</div>
+              <div class="podium-block-title badge-gold">🏆 CHAMPION</div>
+            </div>
+            <div class="podium-side-beam beam-gold left"></div>
+            <div class="podium-side-beam beam-gold right"></div>
+          </div>
         </div>
-        <div class="podium-step step-3">
-          ${top3[2] ? `<img src="${c3.avatar}" class="podium-avatar-img" alt="${c3.name}" onerror="this.src='/avatars/alok.jpg'">` : ''}
-          <div class="podium-rank">3rd</div>
-          <div class="podium-name">${escapeHtml(p3)}</div>
-          <div class="podium-score">${s3} pts</div>
-          <div class="podium-block"></div>
+
+        <!-- RANK 3 (BRONZE - RIGHT) -->
+        <div class="podium-step-gaming step-3-booyah">
+          <div class="podium-avatar-halo ring-bronze">
+            <span class="avatar-crown-icon crown-bronze">👑</span>
+            ${top3[2] ? `<img src="${c3.avatar}" class="podium-avatar-img-booyah" alt="${escapeHtml(c3.name)}" onerror="this.src='/avatars/alok.jpg'">` : `<div class="default-avatar-placeholder"><i class="fa-solid fa-user"></i></div>`}
+          </div>
+          <div class="rank-hex-badge hex-bronze">3</div>
+          <div class="podium-player-name">${escapeHtml(p3)}${top3[2] ? ` (${escapeHtml(c3.name)})` : ''}</div>
+          <div class="podium-score-pill pill-bronze">${s3} pts</div>
+          <div class="podium-3d-block block-bronze">
+            <div class="podium-cap-bevel cap-bronze"></div>
+            <div class="podium-block-content">
+              <div class="podium-giant-rank text-bronze">3</div>
+              <div class="podium-block-title badge-bronze">3RD PLACE</div>
+            </div>
+            <div class="podium-side-beam beam-bronze left"></div>
+            <div class="podium-side-beam beam-bronze right"></div>
+          </div>
         </div>
       `;
 
       const tbody = document.getElementById('fullScoreboardBody');
       if (tbody) {
-        tbody.innerHTML = (data.allScores || []).map(p => {
+        const top3Scores = (data.allScores || []).slice(0, 3);
+        tbody.innerHTML = top3Scores.map(p => {
           const char = p.character || { avatar: '/avatars/alok.jpg', name: 'Alok' };
+          let hexClass = 'hex-table-default';
+          let rowClass = 'table-row-booyah';
+          let scoreClass = 'text-white';
+          if (p.rank === 1) {
+            hexClass = 'hex-gold';
+            rowClass = 'table-row-booyah row-gold-booyah';
+            scoreClass = 'text-yellow';
+          } else if (p.rank === 2) {
+            hexClass = 'hex-silver';
+            scoreClass = 'text-cyan';
+          } else if (p.rank === 3) {
+            hexClass = 'hex-bronze';
+            scoreClass = 'text-bronze';
+          }
+
           return `
-            <tr>
-              <td><strong>#${p.rank}</strong></td>
+            <tr class="${rowClass}">
+              <td><div class="table-hex-badge ${hexClass}">${p.rank}</div></td>
               <td class="scoreboard-player-cell">
                 <img src="${char.avatar}" class="table-avatar-img" alt="" onerror="this.src='/avatars/alok.jpg'">
-                <span>${escapeHtml(p.name)} (${escapeHtml(char.name)})</span>
+                <span class="player-name-text">${escapeHtml(p.name)} ${char.name ? `<small class="char-sub-tag">(${escapeHtml(char.name)})</small>` : ''}</span>
               </td>
-              <td>${escapeHtml(p.roll || 'N/A')}</td>
-              <td><strong>${p.score}</strong> pts</td>
-              <td>${p.totalCorrect} Correct</td>
+              <td>${escapeHtml(p.roll || '-')}</td>
+              <td><strong class="score-val ${scoreClass}">${p.score} pts</strong></td>
+              <td>${p.totalCorrect !== undefined ? `${p.totalCorrect} Correct` : '-'}</td>
             </tr>
           `;
         }).join('');
@@ -976,12 +1205,6 @@ window.PlayerApp = {
 
   toggleSound() {
     if (window.AudioManager) {
-      if (!window.AudioManager.isBgmPlaying && !window.AudioManager.muted) {
-        window.AudioManager.startLobbyMusic();
-        const btn = document.getElementById('playerSoundToggle');
-        if (btn) btn.innerHTML = '🔊 Sound On';
-        return;
-      }
       const isMuted = window.AudioManager.toggleMute();
       const btn = document.getElementById('playerSoundToggle');
       if (btn) btn.innerHTML = isMuted ? '🔇 Sound Off' : '🔊 Sound On';
@@ -1047,7 +1270,7 @@ window.PlayerApp = {
     SoundFX.init();
     if (window.AudioManager) {
       window.AudioManager.setupAutoplayUnlock();
-      window.AudioManager.playSFX(window.AudioManager.SOUNDS.GAME_START, 0.95, true);
+      window.AudioManager.playerJoin();
       window.AudioManager.startLobbyMusic();
     }
 
@@ -1249,8 +1472,10 @@ window.PlayerApp = {
 
     // Authoritative Immediately-Delivered Question Event (No Artificial Delay)
     socket.on('question-started', (data) => {
+      const overlay = document.getElementById('gameStartCountdownOverlay');
+      if (overlay) overlay.style.display = 'none';
       if (window.AudioManager) {
-        window.AudioManager.startLobbyMusic();
+        window.AudioManager.stopBGM(0);
       }
 
       document.getElementById('playerLobbyStage').style.display = 'none';
@@ -1534,7 +1759,14 @@ window.PlayerApp = {
       }
     });
 
+    socket.on('game-starting-countdown', (data) => {
+      triggerGameStartCountdown(data.count || 3);
+    });
+
     socket.on('player-leaderboard-update', () => {
+      if (window.AudioManager) {
+        window.AudioManager.leaderboardOpen();
+      }
       document.getElementById('playerResultStage').style.display = 'none';
       document.getElementById('playerLeaderboardStage').style.display = 'block';
     });
@@ -1563,4 +1795,46 @@ function escapeHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function triggerGameStartCountdown(seconds = 3) {
+  let count = seconds;
+  let overlay = document.getElementById('gameStartCountdownOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'gameStartCountdownOverlay';
+    overlay.className = 'game-start-countdown-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  overlay.style.display = 'flex';
+  if (window.AudioManager) {
+    window.AudioManager.hostStartGame();
+  }
+
+  function tick() {
+    if (count > 0) {
+      overlay.innerHTML = `
+        <div class="countdown-pop-box">
+          <div class="countdown-sub-title">⚡ GAME STARTING IN ⚡</div>
+          <div class="countdown-number-giant">${count}</div>
+          <div class="countdown-sub-text">GET READY!</div>
+        </div>
+      `;
+      count--;
+      setTimeout(tick, 1000);
+    } else {
+      overlay.innerHTML = `
+        <div class="countdown-pop-box">
+          <div class="countdown-sub-title">🔥 GET READY! 🔥</div>
+          <div class="countdown-number-giant text-ready">GO!</div>
+        </div>
+      `;
+      setTimeout(() => {
+        if (overlay) overlay.style.display = 'none';
+      }, 700);
+    }
+  }
+
+  tick();
 }

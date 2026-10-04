@@ -2,13 +2,299 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=/host.html">
-  <title>Redirecting to Quiz Host...</title>
-  <script>
-    window.location.replace('/host.html');
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Cafe Live Quiz | SDG Battle Royale</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Oxanium:wght@600;700;800&family=Poppins:wght@400;600;700;800&family=Luckiest+Guy&display=swap" rel="stylesheet">
+  
+  <!-- App Styles -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body style="background:#0a071b; color:#fff; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh;">
-  <p>Loading Quiz Host Screen...</p>
+<body class="index-page-body">
+
+  <!-- 1️⃣ MAIN HEADER BAR -->
+  <header class="index-header-bar">
+    <!-- Left Logo -->
+    <div class="index-logo-box">
+      <span class="index-logo-lightning">⚡</span>
+      <div class="index-logo-text">
+        <span class="logo-white">THE CAFE</span>
+        <span class="logo-yellow">LIVE QUIZ</span>
+      </div>
+    </div>
+
+    <!-- Center SDG Tagline Capsule -->
+    <div class="index-center-capsule">
+      <span class="cyan-highlight">PLAY</span> • 
+      <span class="white-text">LEARN</span> • 
+      <span class="cyan-highlight">BUILD A BETTER TOMORROW</span>
+    </div>
+
+    <!-- Right Header Action Controls -->
+    <div class="index-header-actions">
+      <button id="indexSoundBtn" class="index-action-pill" onclick="toggleIndexSound()">
+        <i class="fa-solid fa-volume-high"></i> <span id="soundBtnText">Sound On</span>
+      </button>
+      <button class="index-action-pill" onclick="toggleIndexFullscreen()">
+        <i class="fa-solid fa-expand"></i> Fullscreen
+      </button>
+    </div>
+  </header>
+
+  <!-- 2️⃣ HERO SECTION -->
+  <main class="index-hero-container">
+    <div class="index-hero-header">
+      <div class="index-hero-tag"><span class="yellow-lightning">⚡</span> WELCOME TO <span class="yellow-lightning">⚡</span></div>
+      <h1 class="index-hero-title">THE CAFE <span class="title-yellow-brush">LIVE QUIZ</span></h1>
+      <p class="index-hero-subtitle">Test your knowledge • Compete • Support a Sustainable Tomorrow</p>
+    </div>
+
+    <!-- 4 Feature Pills Row -->
+    <div class="index-features-row">
+      <div class="index-feature-pill">
+        <span class="feature-icon">📖</span>
+        <div class="feature-info">
+          <strong class="feature-title">Play</strong>
+          <span class="feature-desc">Fun MCQs</span>
+        </div>
+      </div>
+
+      <div class="index-feature-pill">
+        <span class="feature-icon">👥</span>
+        <div class="feature-info">
+          <strong class="feature-title">Compete</strong>
+          <span class="feature-desc">With Friends</span>
+        </div>
+      </div>
+
+      <div class="index-feature-pill">
+        <span class="feature-icon">📊</span>
+        <div class="feature-info">
+          <strong class="feature-title">Learn</strong>
+          <span class="feature-desc">About SDGs</span>
+        </div>
+      </div>
+
+      <div class="index-feature-pill">
+        <span class="feature-icon">🍃</span>
+        <div class="feature-info">
+          <strong class="feature-title">Make an Impact</strong>
+          <span class="feature-desc">For a Better World</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3️⃣ SELECTION PORTALS (HOST VS PLAYER) -->
+    <div class="index-portals-grid">
+      
+      <!-- HOST PORTAL CARD (GOLD) -->
+      <div class="portal-card-outer portal-card-gold">
+        <div class="portal-card-inner">
+          
+          <!-- Icon Header Banner (No Character Image) -->
+          <div class="portal-avatar-banner banner-gold">
+            <div class="avatar-circle-ring ring-gold">
+              <i class="fa-solid fa-crown portal-header-icon gold-icon-glow"></i>
+            </div>
+          </div>
+
+          <!-- Title & Tagline -->
+          <div class="portal-title-box">
+            <h2 class="portal-title gold-brush-title">
+              <span class="portal-crown-icon">👑</span> HOST
+            </h2>
+            <p class="portal-tagline">Create Quiz Room & Control the Game</p>
+          </div>
+
+          <!-- Feature Bullets -->
+          <ul class="portal-feature-list">
+            <li><i class="fa-solid fa-gear icon-gold"></i> Set Questions & Timer</li>
+            <li><i class="fa-solid fa-users icon-gold"></i> Manage Participants</li>
+            <li><i class="fa-solid fa-chart-column icon-gold"></i> View Live Results</li>
+          </ul>
+
+          <!-- Action Button -->
+          <button class="btn-portal-action btn-portal-gold pulse-glow-gold" onclick="openHostPasswordModal()">
+            ENTER AS HOST ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- PLAYER PORTAL CARD (CYAN) -->
+      <div class="portal-card-outer portal-card-cyan">
+        <div class="portal-card-inner">
+
+          <!-- Icon Header Banner (No Character Image) -->
+          <div class="portal-avatar-banner banner-cyan">
+            <div class="avatar-circle-ring ring-cyan">
+              <i class="fa-solid fa-users portal-header-icon cyan-icon-glow"></i>
+            </div>
+          </div>
+
+          <!-- Title & Tagline -->
+          <div class="portal-title-box">
+            <h2 class="portal-title cyan-brush-title">
+              <span class="portal-users-icon">👥</span> PLAYER
+            </h2>
+            <p class="portal-tagline">Join Quiz Room & Start Playing</p>
+          </div>
+
+          <!-- Feature Bullets -->
+          <ul class="portal-feature-list">
+            <li><i class="fa-solid fa-ticket icon-cyan"></i> Enter Room Code</li>
+            <li><i class="fa-solid fa-gamepad icon-cyan"></i> Answer Questions</li>
+            <li><i class="fa-solid fa-trophy icon-cyan"></i> Compete & Climb Leaderboard</li>
+          </ul>
+
+          <!-- Action Button -->
+          <button class="btn-portal-action btn-portal-cyan pulse-glow-cyan" onclick="enterAsPlayer()">
+            ENTER AS PLAYER ➔
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 4️⃣ HOST PASSWORD AUTHENTICATION MODAL -->
+  <div id="hostAuthModal" class="auth-modal-backdrop" style="display: none;" onclick="if(event.target===this) closeHostPasswordModal()">
+    <div class="auth-modal-box">
+      <!-- Modal Header -->
+      <div class="auth-modal-header">
+        <div class="auth-header-title">
+          <i class="fa-solid fa-shield-halved auth-lock-icon"></i>
+          <span>Host Access Verification</span>
+        </div>
+        <button class="auth-close-btn" onclick="closeHostPasswordModal()">✖</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="auth-modal-body">
+        <p class="auth-instruction-text">Please enter the host security password to access the quiz control screen.</p>
+        
+        <div class="auth-input-group">
+          <i class="fa-solid fa-lock input-left-icon"></i>
+          <input type="password" id="hostPasswordInput" class="auth-password-field" placeholder="Enter Host Password..." onkeyup="if(event.key==='Enter') verifyHostPassword()">
+          <button type="button" class="password-toggle-eye" onclick="togglePasswordVisibility()">
+            <i id="eyeIcon" class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+
+        <div id="authErrorMsg" class="auth-error-banner" style="display: none;">
+          <i class="fa-solid fa-triangle-exclamation"></i> Incorrect Password! Access Denied.
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="auth-modal-footer">
+        <button class="btn-auth-cancel" onclick="closeHostPasswordModal()">Cancel</button>
+        <button class="btn-auth-submit" onclick="verifyHostPassword()">Verify & Enter ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Manager Client Script -->
+  <script src="audio-manager.js"></script>
+
+  <script>
+    // Audio State
+    let isSoundMuted = false;
+
+    function toggleIndexSound() {
+      isSoundMuted = !isSoundMuted;
+      const soundBtnText = document.getElementById('soundBtnText');
+      const soundIcon = document.querySelector('#indexSoundBtn i');
+
+      if (isSoundMuted) {
+        if (soundBtnText) soundBtnText.textContent = 'Sound Off';
+        if (soundIcon) soundIcon.className = 'fa-solid fa-volume-xmark';
+        if (window.AudioManager) window.AudioManager.setMuted(true);
+      } else {
+        if (soundBtnText) soundBtnText.textContent = 'Sound On';
+        if (soundIcon) soundIcon.className = 'fa-solid fa-volume-high';
+        if (window.AudioManager) {
+          window.AudioManager.setMuted(false);
+          window.AudioManager.startLobbyMusic();
+        }
+      }
+    }
+
+    function toggleIndexFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // Modal Control
+    function openHostPasswordModal() {
+      const modal = document.getElementById('hostAuthModal');
+      const input = document.getElementById('hostPasswordInput');
+      const err = document.getElementById('authErrorMsg');
+      
+      if (err) err.style.display = 'none';
+      if (input) {
+        input.value = '';
+        input.classList.remove('input-shake-error');
+      }
+      if (modal) modal.style.display = 'flex';
+      setTimeout(() => input && input.focus(), 100);
+    }
+
+    function closeHostPasswordModal() {
+      const modal = document.getElementById('hostAuthModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('hostPasswordInput');
+      const eye = document.getElementById('eyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        eye.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function verifyHostPassword() {
+      const input = document.getElementById('hostPasswordInput');
+      const err = document.getElementById('authErrorMsg');
+      const password = (input ? input.value : '').trim();
+
+      if (password === 'host123') {
+        // Grant host authentication
+        sessionStorage.setItem('host_authenticated', 'true');
+        window.location.href = '/host.html';
+      } else {
+        if (err) err.style.display = 'flex';
+        if (input) {
+          input.classList.add('input-shake-error');
+          setTimeout(() => input.classList.remove('input-shake-error'), 600);
+        }
+      }
+    }
+
+    function enterAsPlayer() {
+      window.location.href = '/player.html';
+    }
+
+    // Check if redirected from host page requiring auth
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('auth') === 'required') {
+        openHostPasswordModal();
+        const err = document.getElementById('authErrorMsg');
+        if (err) {
+          err.style.display = 'flex';
+          err.innerHTML = `<i class="fa-solid fa-lock"></i> Please enter host password to access host screen.`;
+        }
+      }
+    });
+  </script>
 </body>
 </html>
