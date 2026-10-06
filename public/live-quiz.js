@@ -711,7 +711,10 @@ window.HostApp = {
 
     socket.on('new-question', (data) => {
       const overlay = document.getElementById('gameStartCountdownOverlay');
-      if (overlay) overlay.style.display = 'none';
+      if (overlay) {
+        overlay.classList.remove('active');
+        overlay.remove();
+      }
       if (window.AudioManager) {
         window.AudioManager.stopBGM(0);
       }
@@ -1473,7 +1476,10 @@ window.PlayerApp = {
     // Authoritative Immediately-Delivered Question Event (No Artificial Delay)
     socket.on('question-started', (data) => {
       const overlay = document.getElementById('gameStartCountdownOverlay');
-      if (overlay) overlay.style.display = 'none';
+      if (overlay) {
+        overlay.classList.remove('active');
+        overlay.remove();
+      }
       if (window.AudioManager) {
         window.AudioManager.stopBGM(0);
       }
@@ -1803,11 +1809,11 @@ function triggerGameStartCountdown(seconds = 3) {
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'gameStartCountdownOverlay';
-    overlay.className = 'game-start-countdown-overlay';
+    overlay.className = 'game-start-countdown-overlay active';
     document.body.appendChild(overlay);
   }
 
-  overlay.style.display = 'flex';
+  overlay.classList.add('active');
   if (window.AudioManager) {
     window.AudioManager.hostStartGame();
   }
@@ -1831,7 +1837,10 @@ function triggerGameStartCountdown(seconds = 3) {
         </div>
       `;
       setTimeout(() => {
-        if (overlay) overlay.style.display = 'none';
+        if (overlay) {
+          overlay.classList.remove('active');
+          overlay.remove();
+        }
       }, 700);
     }
   }

@@ -20,14 +20,14 @@ function isOriginAllowed(origin) {
   if (!origin) return true; // Mobile apps, curl, server-to-server
   if (configuredOrigins.length === 0 || configuredOrigins.includes('*')) return true;
   if (configuredOrigins.includes(origin)) return true;
-  // Always permit local development / Wi-Fi testing IP addresses
-  if (/^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+  // Always permit Render domains and local development / Wi-Fi testing IP addresses
+  if (/\.onrender\.com$/.test(origin) || /^https?:\/\/(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origin)) {
     return true;
   }
   return false;
 }
 
-// Enable Socket.IO with production & local CORS support
+// Enable Socket.IO with production & local CORS support and mobile network tolerance
 const io = new Server(server, {
   cors: {
     origin: (origin, callback) => {
@@ -40,7 +40,11 @@ const io = new Server(server, {
     },
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true
-  }
+  },
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  transports: ['websocket', 'polling'],
+  maxHttpBufferSize: 1e7
 });
 
 const port = process.env.PORT || 3001;
@@ -361,6 +365,8 @@ function endQuestion(pin) {
         resultType = 'CORRECT';
         isCorrect = true;
         pointsEarned = ans.pointsEarned || 500;
+        player.score += pointsEarned;
+        player.totalCorrect += 1;
       } else {
         resultType = 'WRONG';
         isCorrect = false;
@@ -783,12 +789,7 @@ function getCharacterData(charId, index = 0) {
     const timeTakenSec = Math.max(0.1, (now - game.questionStartTime) / 1000);
     const isCorrect = (optionIndex === currentQ.correctAnswer);
 
-    let pointsEarned = 0;
-    if (isCorrect) {
-      pointsEarned = 500;
-      player.score += pointsEarned;
-      player.totalCorrect += 1;
-    }
+    let pointsEarned = isCorrect ? 500 : 0;
 
     game.answers[qIndex][pKey] = {
       playerId: player.id,
@@ -802,9 +803,7 @@ function getCharacterData(charId, index = 0) {
 
     socket.emit('answer-accepted', {
       optionIndex: optionIndex,
-      selectedAnswerText: currentQ.options[optionIndex],
-      pointsEarned: pointsEarned,
-      totalScore: player.score
+      selectedAnswerText: currentQ.options[optionIndex]
     });
 
     const activePlayers = Object.values(game.players).filter(p => p.connected !== false);

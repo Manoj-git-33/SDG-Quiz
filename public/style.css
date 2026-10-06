@@ -8691,10 +8691,14 @@ body.room-created-active,
   bottom: 0 !important;
   background: rgba(4, 7, 16, 0.92) !important;
   backdrop-filter: blur(15px) !important;
-  display: flex !important;
+  display: none;
   align-items: center !important;
   justify-content: center !important;
   z-index: 99999 !important;
+}
+
+.game-start-countdown-overlay.active {
+  display: flex !important;
 }
 
 .countdown-pop-box {
