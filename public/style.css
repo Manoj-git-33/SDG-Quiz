@@ -8754,3 +8754,221 @@ body.room-created-active,
   50% { transform: scale(1.1); opacity: 1; }
   100% { transform: scale(1); opacity: 0.9; }
 }
+
+
+/* ==========================================================================
+   📊 COLLAPSIBLE ROOM ACCORDION & DASHBOARD EXCEL STYLES
+   ========================================================================== */
+.room-accordion-card {
+  background: rgba(10, 16, 30, 0.95) !important;
+  border: 2px solid rgba(0, 210, 255, 0.4) !important;
+  border-radius: 14px !important;
+  margin-top: 1.2rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 0 25px rgba(0, 210, 255, 0.2) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.room-accordion-card.active-target-room {
+  border-color: #ffe600 !important;
+  box-shadow: 0 0 35px rgba(255, 230, 0, 0.35) !important;
+}
+
+.room-accordion-header {
+  padding: 1rem 1.4rem !important;
+  background: linear-gradient(90deg, rgba(0, 210, 255, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: background 0.25s ease !important;
+}
+
+.room-accordion-header:hover {
+  background: linear-gradient(90deg, rgba(0, 210, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+}
+
+.room-header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  flex-wrap: wrap !important;
+}
+
+.room-pin-badge {
+  background: linear-gradient(135deg, #ffe600 0%, #ffaa00 100%) !important;
+  color: #000000 !important;
+  font-family: 'Teko', 'Oxanium', sans-serif !important;
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  padding: 2px 14px !important;
+  border-radius: 6px !important;
+  letter-spacing: 1px !important;
+  box-shadow: 0 0 12px rgba(255, 230, 0, 0.4) !important;
+}
+
+.room-set-badge {
+  background: rgba(0, 210, 255, 0.15) !important;
+  border: 1px solid #00d2ff !important;
+  color: #00d2ff !important;
+  font-family: 'Oxanium', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  padding: 3px 10px !important;
+  border-radius: 4px !important;
+}
+
+.room-stage-badge {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #e2e8f0 !important;
+  font-family: 'Oxanium', sans-serif !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  padding: 3px 10px !important;
+  border-radius: 4px !important;
+}
+
+.room-header-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.room-players-count-text {
+  font-family: 'Oxanium', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  color: #00ff88 !important;
+}
+
+.btn-accordion-toggle {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  padding: 0.4rem 0.9rem !important;
+  border-radius: 8px !important;
+  font-family: 'Oxanium', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-accordion-toggle:hover {
+  background: rgba(0, 210, 255, 0.3) !important;
+  border-color: #00d2ff !important;
+  color: #00d2ff !important;
+}
+
+.room-accordion-body {
+  padding: 1.2rem 1.4rem !important;
+  background: rgba(6, 11, 24, 0.9) !important;
+  display: none;
+}
+
+.room-accordion-body.open {
+  display: block !important;
+}
+
+/* Excel Spreadsheet Table Styles */
+.excel-table-container {
+  width: 100% !important;
+  overflow-x: auto !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-top: 0.8rem !important;
+}
+
+.excel-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-family: 'Inter', 'Poppins', sans-serif !important;
+  font-size: 0.9rem !important;
+}
+
+.excel-table th {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #00d2ff !important;
+  font-family: 'Oxanium', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  padding: 0.8rem 1rem !important;
+  border-bottom: 2px solid rgba(0, 210, 255, 0.3) !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.excel-table td {
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #cbd5e1 !important;
+  vertical-align: middle !important;
+}
+
+.excel-table tr:hover {
+  background: rgba(0, 210, 255, 0.08) !important;
+}
+
+.excel-table tr.row-rank-1 {
+  background: rgba(255, 230, 0, 0.1) !important;
+}
+
+.excel-toolbar-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.8rem !important;
+  background: rgba(15, 23, 42, 0.7) !important;
+  padding: 0.6rem 1rem !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.excel-search-input {
+  background: rgba(6, 11, 24, 0.8) !important;
+  border: 1px solid rgba(0, 210, 255, 0.4) !important;
+  color: #ffffff !important;
+  padding: 0.45rem 0.8rem 0.45rem 2.2rem !important;
+  border-radius: 6px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.85rem !important;
+  outline: none !important;
+}
+
+.excel-search-input:focus {
+  border-color: #00d2ff !important;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.3) !important;
+}
+
+/* Toast Notification */
+.dashboard-toast {
+  position: fixed !important;
+  bottom: 25px !important;
+  right: 25px !important;
+  background: linear-gradient(135deg, #00e640 0%, #009926 100%) !important;
+  color: #ffffff !important;
+  padding: 0.8rem 1.4rem !important;
+  border-radius: 10px !important;
+  font-family: 'Oxanium', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  box-shadow: 0 0 20px rgba(0, 230, 64, 0.5) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+  animation: toastFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes toastFadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

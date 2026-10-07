@@ -492,11 +492,8 @@ window.HostApp = {
     if (!body) return;
 
     if (forceRefresh) {
-      body.innerHTML = `
-        <div style="text-align: center; padding: 3rem;">
-          <div class="cyan-text font-bold" style="font-size: 1.3rem;"><i class="fa-solid fa-spinner fa-spin"></i> Refreshing All Student Data...</div>
-        </div>
-      `;
+      const refreshBtns = document.querySelectorAll('.fa-rotate');
+      refreshBtns.forEach(btn => btn.classList.add('fa-spin'));
     }
 
     try {
@@ -504,138 +501,191 @@ window.HostApp = {
       if (!res.ok) return;
       const data = await res.json();
       const activeRooms = data.activeRooms || [];
-      const historical = data.historical || [];
 
-      let players = [];
-
-      // 1. Gather current live room players from HostApp memory
-      if (Array.isArray(this.players) && this.players.length > 0) {
-        this.players.forEach(p => players.push(p));
-      }
-
-      // 2. Gather live connected players from active rooms API response
-      activeRooms.forEach(r => {
-        if (Array.isArray(r.players)) {
-          r.players.forEach(p => {
-            if (!players.some(existing => (existing.id && existing.id === p.id) || (existing.name === p.name && existing.roll === p.roll))) {
-              players.push(p);
-            }
-          });
-        }
-      });
-
-      // 3. Fallback to historical student records if no active room players
-      if (players.length === 0) {
-        historical.forEach(rec => {
-          if (Array.isArray(rec.results)) {
-            rec.results.forEach(p => players.push(p));
-          } else if (rec.name) {
-            players.push({
-              name: rec.name,
-              roll: rec.roll || 'N/A',
-              score: rec.score || rec.totalScore || 0,
-              character: { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' }
-            });
-          }
+      // If HostApp memory has a room not yet in API response, add virtual active room
+      if (this.pin && !activeRooms.some(r => String(r.pin) === String(this.pin))) {
+        activeRooms.unshift({
+          pin: this.pin,
+          state: 'ACTIVE',
+          setKey: 'SDG',
+          playersCount: (this.players || []).length,
+          players: this.players || []
         });
       }
 
-      players.sort((a, b) => (b.score || 0) - (a.score || 0));
+      if (activeRooms.length === 0) {
+        body.innerHTML = `
+          <div style="text-align: center; padding: 3rem;">
+            <div class="empty-icon" style="font-size: 3rem;">🎮</div>
+            <h4 class="cyan-text">No Active Quiz Rooms Right Now</h4>
+            <p class="subtitle-gaming">Create a game room to see connected students per room PIN here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const hostCurrentPin = String(this.pin || '');
       const medals = ['🥇', '🥈', '🥉'];
 
+      if (!this._modalOpenAccordions) this._modalOpenAccordions = {};
+
       body.innerHTML = `
+        <!-- SUMMARY ROW -->
         <div class="modal-stats-grid margin-bottom">
           <div class="stat-pill-box pill-cyan" style="padding: 0.8rem 1rem;">
             <div class="stat-text-wrapper">
-              <div class="stat-label-sub">Connected Live Students</div>
-              <div class="stat-value-cyan" style="font-size: 1.6rem;">${players.length}</div>
+              <div class="stat-label-sub">Active Game Rooms</div>
+              <div class="stat-value-cyan" style="font-size: 1.5rem;">${activeRooms.length}</div>
             </div>
           </div>
           <div class="stat-pill-box pill-gold" style="padding: 0.8rem 1rem;">
             <div class="stat-text-wrapper">
-              <div class="stat-label-sub">Current Top Leader</div>
-              <div class="stat-value-gold" style="font-size: 1.4rem;">${players[0] ? `${players[0].name} (${players[0].score || 0} pts)` : 'None'}</div>
+              <div class="stat-label-sub">Current Room PIN</div>
+              <div class="stat-value-gold" style="font-size: 1.5rem;">${hostCurrentPin || 'Global'}</div>
             </div>
           </div>
         </div>
 
-        <!-- EXCEL SPREADSHEET TOOLBAR -->
-        <div class="excel-toolbar-bar">
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <h4 class="cyan-text" style="margin: 0; font-size: 1.1rem;"><i class="fa-solid fa-file-excel"></i> Student Excel Record Sheet</h4>
-            <span class="control-pill-gaming" style="font-size: 0.75rem; padding: 2px 8px;">${players.length} Total Row(s)</span>
-          </div>
-          <div style="display: flex; gap: 0.6rem; align-items: center;">
-            <div style="position: relative;">
-              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #00d2ff; font-size: 0.85rem;"></i>
-              <input type="text" id="excelModalSearch" class="excel-search-input" placeholder="Filter name, roll or char..." oninput="HostApp.filterExcelTable(this.value)">
+        <!-- PER ROOM ACCORDIONS -->
+        ${activeRooms.map((room, idx) => {
+          const pin = String(room.pin);
+          if (this._modalOpenAccordions[pin] === undefined) {
+            this._modalOpenAccordions[pin] = (hostCurrentPin && hostCurrentPin === pin) || (!hostCurrentPin && idx === 0);
+          }
+
+          const isOpen = !!this._modalOpenAccordions[pin];
+          const isHostRoom = hostCurrentPin === pin;
+          const sortedPlayers = [...(room.players || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+          return `
+            <div class="room-accordion-card ${isHostRoom ? 'active-target-room' : ''}" id="modalRoomCard_${pin}">
+              
+              <!-- Accordion Header -->
+              <div class="room-accordion-header" onclick="HostApp.toggleModalRoomAccordion('${pin}')">
+                <div class="room-header-left">
+                  <span class="room-pin-badge">ROOM PIN: ${pin}</span>
+                  <span class="room-set-badge">SET: ${escapeHtml(room.setKey || 'SDG')}</span>
+                  <span class="room-stage-badge">${escapeHtml(room.state || 'ACTIVE')}</span>
+                  ${isHostRoom ? `<span class="control-pill-gaming" style="font-size: 0.75rem; background: rgba(255, 230, 0, 0.2); border-color: #ffe600; color: #ffe600;">★ YOUR HOST ROOM</span>` : ''}
+                </div>
+                <div class="room-header-right">
+                  <span class="room-players-count-text">🟢 ${room.playersCount || sortedPlayers.length} Connected</span>
+                  <button class="btn-accordion-toggle" type="button">
+                    <i id="modalToggleIcon_${pin}" class="fa-solid ${isOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
+                    <span id="modalToggleText_${pin}">${isOpen ? 'Collapse' : 'Expand'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Accordion Body -->
+              <div class="room-accordion-body ${isOpen ? 'open' : ''}" id="modalRoomBody_${pin}">
+                
+                <div class="excel-toolbar-bar">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <h4 class="cyan-text" style="margin: 0; font-size: 1.05rem;"><i class="fa-solid fa-file-excel"></i> Room ${pin} Excel Sheet</h4>
+                    <span class="control-pill-gaming" style="font-size: 0.75rem; padding: 2px 8px;">${sortedPlayers.length} Student(s)</span>
+                  </div>
+                  <div style="display: flex; gap: 0.6rem; align-items: center;">
+                    <div style="position: relative;">
+                      <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #00d2ff; font-size: 0.85rem;"></i>
+                      <input type="text" class="excel-search-input" placeholder="Search Room ${pin}..." oninput="HostApp.filterModalRoomTable('${pin}', this.value)">
+                    </div>
+                    <button class="btn-refresh-gaming" onclick="HostApp.updateDashboardModalData(true)" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+                      <i class="fa-solid fa-rotate"></i> Refresh 🔄
+                    </button>
+                  </div>
+                </div>
+
+                <div class="excel-table-container">
+                  <table class="excel-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 70px; text-align: center;">Rank</th>
+                        <th>Student Name</th>
+                        <th>Roll Number</th>
+                        <th>Character</th>
+                        <th>Total Score</th>
+                        <th>Accuracy</th>
+                        <th style="text-align: center;">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="modalRoomTableBody_${pin}">
+                      ${sortedPlayers.map((p, pIdx) => {
+                        const medal = medals[pIdx] || `#${pIdx + 1}`;
+                        const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
+                        const charName = String(char.name || 'Alok');
+                        const rowClass = pIdx === 0 ? 'row-rank-1' : '';
+                        const scoreColor = pIdx === 0 ? 'text-yellow' : (pIdx === 1 ? 'text-cyan' : (pIdx === 2 ? 'text-bronze' : 'text-white'));
+
+                        return `
+                          <tr class="${rowClass}" data-search="${escapeHtml((p.name || '') + ' ' + (p.roll || '') + ' ' + charName).toLowerCase()}">
+                            <td style="text-align: center;"><strong style="font-size: 1.05rem;">${medal}</strong></td>
+                            <td style="font-weight: 700; color: #ffffff;">
+                              <img src="${char.avatar || '/avatars/alok.jpg'}" class="table-avatar-img" alt="" onerror="this.src='/avatars/alok.jpg'">
+                              ${escapeHtml(p.name || 'Student')}
+                            </td>
+                            <td><span style="font-family: monospace; font-size: 0.95rem; color: #cbd5e1;">${escapeHtml(p.roll || '-')}</span></td>
+                            <td><span class="char-sub-tag" style="margin: 0;">${escapeHtml(charName)}</span></td>
+                            <td><strong class="${scoreColor}" style="font-size: 1.1rem;">${p.score || 0} pts</strong></td>
+                            <td>${p.totalCorrect !== undefined ? `${p.totalCorrect} Correct` : '-'}</td>
+                            <td style="text-align: center;">
+                              <span class="control-pill-gaming" style="font-size: 0.75rem; background: rgba(0, 230, 64, 0.15); border-color: #00e640; color: #00ff88;">
+                                ● CONNECTED
+                              </span>
+                            </td>
+                          </tr>
+                        `;
+                      }).join('') || `
+                        <tr>
+                          <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                            No connected students in Room ${pin} yet.
+                          </td>
+                        </tr>
+                      `}
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
             </div>
-            <button class="btn-refresh-gaming" onclick="HostApp.updateDashboardModalData(true)" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
-              <i class="fa-solid fa-rotate"></i> Refresh 🔄
-            </button>
-          </div>
-        </div>
-
-        <!-- EXCEL SPREADSHEET TABLE -->
-        <div class="excel-table-container">
-          <table class="excel-table">
-            <thead>
-              <tr>
-                <th style="width: 70px; text-align: center;">Rank</th>
-                <th>Student Name</th>
-                <th>Roll Number</th>
-                <th>Character</th>
-                <th>Total Score</th>
-                <th>Accuracy</th>
-                <th style="text-align: center;">Status</th>
-              </tr>
-            </thead>
-            <tbody id="excelTableBody">
-              ${players.map((p, idx) => {
-                const medal = medals[idx] || `#${idx + 1}`;
-                const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
-                const charName = String(char.name || 'Alok');
-                const rowClass = idx === 0 ? 'row-rank-1' : '';
-                const scoreColor = idx === 0 ? 'text-yellow' : (idx === 1 ? 'text-cyan' : (idx === 2 ? 'text-bronze' : 'text-white'));
-
-                return `
-                  <tr class="${rowClass}" data-search="${escapeHtml((p.name || '') + ' ' + (p.roll || '') + ' ' + charName).toLowerCase()}">
-                    <td style="text-align: center;"><strong style="font-size: 1.05rem;">${medal}</strong></td>
-                    <td style="font-weight: 700; color: #ffffff;">
-                      <img src="${char.avatar || '/avatars/alok.jpg'}" class="table-avatar-img" alt="" onerror="this.src='/avatars/alok.jpg'">
-                      ${escapeHtml(p.name || 'Student')}
-                    </td>
-                    <td><span style="font-family: monospace; font-size: 0.95rem; color: #cbd5e1;">${escapeHtml(p.roll || '-')}</span></td>
-                    <td><span class="char-sub-tag" style="margin: 0;">${escapeHtml(charName)}</span></td>
-                    <td><strong class="${scoreColor}" style="font-size: 1.1rem;">${p.score || 0} pts</strong></td>
-                    <td>${p.totalCorrect !== undefined ? `${p.totalCorrect} Correct` : '-'}</td>
-                    <td style="text-align: center;">
-                      <span class="control-pill-gaming" style="font-size: 0.75rem; background: rgba(0, 230, 64, 0.15); border-color: #00e640; color: #00ff88;">
-                        ● CONNECTED
-                      </span>
-                    </td>
-                  </tr>
-                `;
-              }).join('') || `
-                <tr>
-                  <td colspan="7" style="text-align: center; padding: 2.5rem; color: #94a3b8;">
-                    No student records found right now. Click Refresh 🔄 to update.
-                  </td>
-                </tr>
-              `}
-            </tbody>
-          </table>
-        </div>
+          `;
+        }).join('')}
       `;
     } catch (err) {
       console.warn('Failed to update dashboard modal:', err);
       body.innerHTML = `<p class="subtitle-gaming">Error loading live data. Please try refreshing.</p>`;
+    } finally {
+      setTimeout(() => {
+        const refreshBtns = document.querySelectorAll('.fa-rotate');
+        refreshBtns.forEach(btn => btn.classList.remove('fa-spin'));
+      }, 500);
     }
   },
 
-  filterExcelTable(query) {
+  toggleModalRoomAccordion(pin) {
+    if (!this._modalOpenAccordions) this._modalOpenAccordions = {};
+    this._modalOpenAccordions[pin] = !this._modalOpenAccordions[pin];
+    
+    const bodyEl = document.getElementById(`modalRoomBody_${pin}`);
+    const iconEl = document.getElementById(`modalToggleIcon_${pin}`);
+    const textEl = document.getElementById(`modalToggleText_${pin}`);
+
+    if (bodyEl) {
+      if (this._modalOpenAccordions[pin]) {
+        bodyEl.classList.add('open');
+        if (iconEl) iconEl.className = 'fa-solid fa-chevron-up';
+        if (textEl) textEl.textContent = 'Collapse';
+      } else {
+        bodyEl.classList.remove('open');
+        if (iconEl) iconEl.className = 'fa-solid fa-chevron-down';
+        if (textEl) textEl.textContent = 'Expand';
+      }
+    }
+  },
+
+  filterModalRoomTable(pin, query) {
     const q = (query || '').toLowerCase().trim();
-    const rows = document.querySelectorAll('#excelTableBody tr');
+    const rows = document.querySelectorAll(`#modalRoomTableBody_${pin} tr`);
     rows.forEach(row => {
       const searchData = row.dataset.search || '';
       if (!q || searchData.includes(q)) {

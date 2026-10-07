@@ -128,23 +128,81 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     let globalDashboardData = { activeRooms: [], historical: [] };
+    let openRoomAccordions = {};
 
     document.addEventListener('DOMContentLoaded', () => {
       loadDashboardData();
       setInterval(loadDashboardData, 4000); // Auto-refresh live data every 4s
     });
 
-    async function loadDashboardData() {
+    async function loadDashboardData(isManual = false) {
+      const refreshBtns = document.querySelectorAll('.fa-rotate');
+      refreshBtns.forEach(btn => btn.classList.add('fa-spin'));
+
       try {
         const baseUrl = (typeof window.getQuizSocketUrl === 'function') ? window.getQuizSocketUrl() : '';
         const res = await fetch(`${baseUrl}/api/dashboard`);
         if (res.ok) {
           globalDashboardData = await res.json();
           renderDashboard();
+          if (isManual) {
+            showDashboardToast('Refreshed! Live student records updated.');
+          }
         }
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
+      } finally {
+        setTimeout(() => {
+          refreshBtns.forEach(btn => btn.classList.remove('fa-spin'));
+        }, 500);
       }
+    }
+
+    function showDashboardToast(msg) {
+      let toast = document.getElementById('dashboardToastMsg');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'dashboardToastMsg';
+        toast.className = 'dashboard-toast';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        if (toast) toast.style.display = 'none';
+      }, 3000);
+    }
+
+    function toggleRoomAccordion(pin) {
+      openRoomAccordions[pin] = !openRoomAccordions[pin];
+      const bodyEl = document.getElementById(`roomBody_${pin}`);
+      const iconEl = document.getElementById(`toggleIcon_${pin}`);
+      const textEl = document.getElementById(`toggleText_${pin}`);
+
+      if (bodyEl) {
+        if (openRoomAccordions[pin]) {
+          bodyEl.classList.add('open');
+          if (iconEl) iconEl.className = 'fa-solid fa-chevron-up';
+          if (textEl) textEl.textContent = 'Collapse';
+        } else {
+          bodyEl.classList.remove('open');
+          if (iconEl) iconEl.className = 'fa-solid fa-chevron-down';
+          if (textEl) textEl.textContent = 'Expand';
+        }
+      }
+    }
+
+    function filterRoomTable(pin, query) {
+      const q = (query || '').toLowerCase().trim();
+      const rows = document.querySelectorAll(`#roomTableBody_${pin} tr`);
+      rows.forEach(row => {
+        const searchData = row.dataset.search || '';
+        if (!q || searchData.includes(q)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
     }
 
     function switchTab(tab) {
@@ -230,42 +288,117 @@
         return;
       }
 
-      container.innerHTML = activeRooms.map(room => {
-        // Sort live room players by score descending
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetPin = urlParams.get('pin');
+
+      container.innerHTML = activeRooms.map((room, idx) => {
+        const pin = String(room.pin);
+        
+        if (openRoomAccordions[pin] === undefined) {
+          if (targetPin && targetPin === pin) {
+            openRoomAccordions[pin] = true;
+          } else if (!targetPin && idx === 0) {
+            openRoomAccordions[pin] = true;
+          } else {
+            openRoomAccordions[pin] = false;
+          }
+        }
+
+        const isOpen = !!openRoomAccordions[pin];
+        const isTarget = targetPin === pin;
         const sortedPlayers = [...(room.players || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
         const medals = ['🥇', '🥈', '🥉'];
 
         return `
-          <div class="room-dashboard-box box-neon-blue margin-top">
-            <div class="room-header-row">
-              <div>
-                <span class="room-badge">ROOM PIN: ${room.pin}</span>
-                <span class="set-badge">${room.setKey}</span>
-                <span class="state-badge">${room.state} STAGE</span>
+          <div class="room-accordion-card ${isTarget ? 'active-target-room' : ''}" id="roomCard_${pin}">
+            
+            <!-- Accordion Header -->
+            <div class="room-accordion-header" onclick="toggleRoomAccordion('${pin}')">
+              <div class="room-header-left">
+                <span class="room-pin-badge">ROOM PIN: ${pin}</span>
+                <span class="room-set-badge">SET: ${escapeHtml(room.setKey || 'SDG')}</span>
+                <span class="room-stage-badge">${escapeHtml(room.state || 'ACTIVE')} STAGE</span>
               </div>
-              <div class="cyan-text font-bold">
-                Connected Players: ${room.playersCount}
+              <div class="room-header-right">
+                <span class="room-players-count-text">🟢 ${room.playersCount || 0} Connected Students</span>
+                <button class="btn-accordion-toggle" type="button" id="toggleBtn_${pin}">
+                  <i id="toggleIcon_${pin}" class="fa-solid ${isOpen ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
+                  <span id="toggleText_${pin}">${isOpen ? 'Collapse' : 'Expand'}</span>
+                </button>
               </div>
             </div>
 
-            <div class="player-grid margin-top">
-              ${sortedPlayers.map((p, idx) => {
-                const medal = medals[idx] || `#${idx + 1}`;
-                const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
-                const charName = String(char.name || 'Alok');
-                return `
-                  <div class="gaming-player-card" style="--char-color: ${char.color || '#00d2ff'}">
-                    <div class="char-avatar-wrapper">
-                      <img src="${char.avatar || '/avatars/alok.jpg'}" alt="${escapeHtml(charName)}" class="char-avatar-img" onerror="this.src='/avatars/alok.jpg'">
-                      <span class="char-badge-tag">${medal} ${escapeHtml(charName.toUpperCase())}</span>
-                    </div>
-                    <div class="player-info-block">
-                      <span class="player-name-text">${escapeHtml(p.name || 'Student')}</span>
-                      <span class="player-roll-text">${p.roll ? `Roll: ${escapeHtml(p.roll)} | ` : ''}Points: <strong class="yellow-text" style="font-size: 1.1rem;">${p.score || 0} pts</strong></span>
-                    </div>
+            <!-- Collapsible Accordion Body -->
+            <div class="room-accordion-body ${isOpen ? 'open' : ''}" id="roomBody_${pin}">
+              
+              <!-- Excel Toolbar -->
+              <div class="excel-toolbar-bar">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <h4 class="cyan-text" style="margin: 0; font-size: 1.05rem;"><i class="fa-solid fa-file-excel"></i> Room ${pin} Student Excel Record Sheet</h4>
+                  <span class="control-pill-gaming" style="font-size: 0.75rem; padding: 2px 8px;">${sortedPlayers.length} Total Row(s)</span>
+                </div>
+                <div style="display: flex; gap: 0.6rem; align-items: center;">
+                  <div style="position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #00d2ff; font-size: 0.85rem;"></i>
+                    <input type="text" class="excel-search-input" placeholder="Filter Room ${pin} students..." oninput="filterRoomTable('${pin}', this.value)">
                   </div>
-                `;
-              }).join('') || '<p class="subtitle-gaming">No players joined this room yet.</p>'}
+                  <button class="btn-refresh-gaming" onclick="loadDashboardData(true)" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+                    <i class="fa-solid fa-rotate"></i> Refresh 🔄
+                  </button>
+                </div>
+              </div>
+
+              <!-- Excel Table -->
+              <div class="excel-table-container">
+                <table class="excel-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 70px; text-align: center;">Rank</th>
+                      <th>Student Name</th>
+                      <th>Roll Number</th>
+                      <th>Character</th>
+                      <th>Total Score</th>
+                      <th>Accuracy</th>
+                      <th style="text-align: center;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="roomTableBody_${pin}">
+                    ${sortedPlayers.map((p, pIdx) => {
+                      const medal = medals[pIdx] || `#${pIdx + 1}`;
+                      const char = (p.character && typeof p.character === 'object') ? p.character : { name: 'Alok', avatar: '/avatars/alok.jpg', color: '#00d2ff' };
+                      const charName = String(char.name || 'Alok');
+                      const rowClass = pIdx === 0 ? 'row-rank-1' : '';
+                      const scoreColor = pIdx === 0 ? 'text-yellow' : (pIdx === 1 ? 'text-cyan' : (pIdx === 2 ? 'text-bronze' : 'text-white'));
+
+                      return `
+                        <tr class="${rowClass}" data-search="${escapeHtml((p.name || '') + ' ' + (p.roll || '') + ' ' + charName).toLowerCase()}">
+                          <td style="text-align: center;"><strong style="font-size: 1.05rem;">${medal}</strong></td>
+                          <td style="font-weight: 700; color: #ffffff;">
+                            <img src="${char.avatar || '/avatars/alok.jpg'}" class="table-avatar-img" alt="" onerror="this.src='/avatars/alok.jpg'">
+                            ${escapeHtml(p.name || 'Student')}
+                          </td>
+                          <td><span style="font-family: monospace; font-size: 0.95rem; color: #cbd5e1;">${escapeHtml(p.roll || '-')}</span></td>
+                          <td><span class="char-sub-tag" style="margin: 0;">${escapeHtml(charName)}</span></td>
+                          <td><strong class="${scoreColor}" style="font-size: 1.1rem;">${p.score || 0} pts</strong></td>
+                          <td>${p.totalCorrect !== undefined ? `${p.totalCorrect} Correct` : '-'}</td>
+                          <td style="text-align: center;">
+                            <span class="control-pill-gaming" style="font-size: 0.75rem; background: rgba(0, 230, 64, 0.15); border-color: #00e640; color: #00ff88;">
+                              ● CONNECTED
+                            </span>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('') || `
+                      <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                          No student records in Room ${pin} yet.
+                        </td>
+                      </tr>
+                    `}
+                  </tbody>
+                </table>
+              </div>
+
             </div>
           </div>
         `;

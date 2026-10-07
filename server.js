@@ -69,9 +69,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
-// Serve static files both at root / and /public/ route
-app.use(express.static(PUBLIC_DIR));
-app.use('/public', express.static(PUBLIC_DIR));
+// Serve static files with 1-day browser asset caching for high-concurrency (300+ players) performance
+const staticOptions = {
+  maxAge: '1d',
+  etag: true
+};
+app.use(express.static(PUBLIC_DIR, staticOptions));
+app.use('/public', express.static(PUBLIC_DIR, staticOptions));
 
 // Helper: Get local network IP address
 function getLocalIp() {
